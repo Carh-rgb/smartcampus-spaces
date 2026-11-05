@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\IncidentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Incident extends Model
 {
-    /** @use HasFactory<\Database\Factories\IncidentFactory> */
+    /** @use HasFactory<IncidentFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

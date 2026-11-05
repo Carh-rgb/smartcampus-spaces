@@ -25,16 +25,6 @@
 
             <flux:spacer />
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/Carh-rgb/smartcampus-spaces" target="_blank">
-                    Repositorio
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs" target="_blank">
-                    Documentacion
-                </flux:navlist.item>
-            </flux:navlist>
-
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
                 <flux:profile
@@ -66,7 +56,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Settings</flux:menu.item>
+                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -116,7 +106,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Settings</flux:menu.item>
+                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />

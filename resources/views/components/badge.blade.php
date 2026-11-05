@@ -2,7 +2,7 @@
 
 @php
     // Tono segun el significado del estado, no segun la entidad:
-    // verde = todo en orden, ambar = requiere atencion, rojo = bloqueado.
+    // verde = todo en orden, ambar = requiere atención, rojo = bloqueado.
     $tones = [
         'available' => 'emerald',
         'operational' => 'emerald',

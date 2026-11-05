@@ -10,7 +10,7 @@
     </div>
 
     <div class="mt-5">
-        <x-textarea name="description" label="Descripcion (opcional)" :value="$resource->description" rows="2"
+        <x-textarea name="description" label="Descripción (opcional)" :value="$resource->description" rows="2"
             maxlength="255" />
     </div>
 </div>

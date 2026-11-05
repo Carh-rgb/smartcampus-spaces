@@ -51,7 +51,7 @@
                 </div>
                 @if ($incident->solution)
                     <div class="sm:col-span-2">
-                        <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Solucion aplicada</dt>
+                        <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Solución aplicada</dt>
                         <dd class="text-zinc-900 dark:text-zinc-100">{{ $incident->solution }}</dd>
                         <dd class="text-xs text-zinc-500 dark:text-zinc-400">Cerrado el {{ $incident->resolved_at?->format('d/m/Y H:i') }}</dd>
                     </div>
@@ -60,7 +60,7 @@
         </div>
 
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-            <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Gestion</h2>
+            <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Gestión</h2>
 
             @if (auth()->user()->isAdmin() && $incident->status !== 'resolved')
                 <form method="POST" action="{{ route('incidents.assign', $incident) }}" class="mb-5 flex flex-col gap-3">
@@ -75,16 +75,16 @@
                     class="flex flex-col gap-3 border-t border-zinc-200 pt-5 dark:border-zinc-700">
                     @csrf
                     @method('PATCH')
-                    <x-textarea name="solution" label="Solucion aplicada" rows="3" maxlength="500" required />
+                    <x-textarea name="solution" label="Solución aplicada" rows="3" maxlength="500" required />
                     <x-btn variant="success" type="submit">Marcar como resuelto</x-btn>
                 </form>
             @elseif ($incident->status === 'resolved')
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                    Este incidente ya fue resuelto. No requiere mas gestion.
+                    Este incidente ya fue resuelto. No requiere más gestión.
                 </p>
             @else
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                    El administrador asignara un responsable y registrara la solucion.
+                    El administrador asignará un responsable y registrará la solución.
                 </p>
             @endif
         </div>

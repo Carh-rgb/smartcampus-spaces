@@ -42,7 +42,7 @@
                     </dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Razon de uso</dt>
+                    <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Razón de uso</dt>
                     <dd class="text-zinc-900 dark:text-zinc-100">{{ $reservation->purpose }}</dd>
                 </div>
                 <div>
@@ -50,27 +50,27 @@
                     <dd class="text-zinc-900 dark:text-zinc-100">{{ $reservation->approver?->name ?? 'Sin revisar' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Fecha de revision</dt>
+                    <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Fecha de revisión</dt>
                     <dd class="text-zinc-900 dark:text-zinc-100">{{ $reservation->reviewed_at?->format('d/m/Y H:i') ?? '—' }}</dd>
                 </div>
                 @if ($reservation->review_notes)
                     <div class="sm:col-span-2">
-                        <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Observacion</dt>
+                        <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Observación</dt>
                         <dd class="text-zinc-900 dark:text-zinc-100">{{ $reservation->review_notes }}</dd>
                     </div>
                 @endif
             </dl>
         </div>
 
-        {{-- Panel de decision: solo para el administrador y solo si sigue pendiente --}}
+        {{-- Panel de decisión: solo para el administrador y solo si sigue pendiente --}}
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
             @if (auth()->user()->isAdmin() && $reservation->status === 'pending')
-                <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Decision</h2>
+                <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Decisión</h2>
 
                 <form method="POST" action="{{ route('reservations.approve', $reservation) }}" class="mb-5 flex flex-col gap-3">
                     @csrf
                     @method('PATCH')
-                    <x-input name="review_notes" label="Observacion (opcional)" maxlength="500" />
+                    <x-input name="review_notes" label="Observación (opcional)" maxlength="500" />
                     <x-btn variant="success" type="submit">Aprobar reserva</x-btn>
                 </form>
 

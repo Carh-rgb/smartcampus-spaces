@@ -1,4 +1,4 @@
-<x-page title="Editar solicitud" subtitle="Solo se puede modificar mientras siga pendiente de aprobacion."
+<x-page title="Editar solicitud" subtitle="Solo se puede modificar mientras siga pendiente de aprobación."
     :back="route('reservations.show', $reservation)">
 
     <form method="POST" action="{{ route('reservations.update', $reservation) }}" class="flex flex-col gap-5">

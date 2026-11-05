@@ -11,7 +11,7 @@
         <div class="md:col-span-2">
             <x-select name="space_id" label="Espacio" :options="$spaceOptions" :selected="$selectedSpace"
                 placeholder="Selecciona un espacio..." required
-                help="Solo aparecen los espacios disponibles; los que estan en mantenimiento no se pueden reservar." />
+                help="Solo aparecen los espacios disponibles; los que están en mantenimiento no se pueden reservar." />
         </div>
 
         <x-input name="date" label="Fecha" type="date" :value="$reservation->date?->format('Y-m-d')" required
@@ -27,7 +27,7 @@
     </div>
 
     <div class="mt-5">
-        <x-textarea name="purpose" label="Razon de uso" :value="$reservation->purpose" rows="2" maxlength="255" required
-            help="Por ejemplo: Clase practica de Bases de Datos II." />
+        <x-textarea name="purpose" label="Razón de uso" :value="$reservation->purpose" rows="2" maxlength="255" required
+            help="Por ejemplo: Clase práctica de Bases de Datos II." />
     </div>
 </div>

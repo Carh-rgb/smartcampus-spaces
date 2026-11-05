@@ -15,7 +15,7 @@
         </a>
         <a href="{{ route('resources.index') }}" class="rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-500" wire:navigate>
             <p class="text-3xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">{{ $metrics['resources'] }}</p>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">recursos en el catalogo</p>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">recursos en el catálogo</p>
         </a>
         <a href="{{ route('reservations.index', ['status' => 'pending']) }}" class="rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-500" wire:navigate>
             <p class="text-3xl font-semibold tabular-nums text-amber-600 dark:text-amber-400">{{ $metrics['pending'] }}</p>
@@ -31,7 +31,7 @@
         <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
                 <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">
-                    {{ auth()->user()->isAdmin() ? 'Solicitudes por aprobar' : 'Tus proximas reservas' }}
+                    {{ auth()->user()->isAdmin() ? 'Solicitudes por aprobar' : 'Tus próximas reservas' }}
                 </h2>
                 <a href="{{ route('reservations.index') }}" class="text-sm text-zinc-500 hover:underline dark:text-zinc-400" wire:navigate>Ver todas</a>
             </div>

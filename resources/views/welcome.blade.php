@@ -15,7 +15,7 @@
 
 <body class="min-h-screen bg-white font-sans text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100">
     <div class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16">
-        {{-- Si la entidad define APP_ORGANIZATION en el .env, se muestra aqui --}}
+        {{-- Si la entidad define APP_ORGANIZATION en el .env, se muestra aquí --}}
         @if (config('app.organization'))
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
                 {{ config('app.organization') }}
@@ -25,7 +25,7 @@
         <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">{{ config('app.name') }}</h1>
 
         <p class="mt-4 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-            Sistema de gestion y reserva de espacios fisicos y recursos tecnologicos: solicita una sala,
+            Sistema de gestión y reserva de espacios físicos y recursos tecnológicos: solicita una sala,
             consulta su disponibilidad en tiempo real y reporta las novedades desde un solo lugar.
         </p>
 
@@ -35,12 +35,12 @@
                 <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Salas, laboratorios y auditorios con el equipamiento que tiene cada uno.</p>
             </div>
             <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                <p class="font-medium">Reservas con aprobacion</p>
+                <p class="font-medium">Reservas con aprobación</p>
                 <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Solicitudes por fecha y franja horaria, sin cruces de horario.</p>
             </div>
             <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
                 <p class="font-medium">Incidentes con seguimiento</p>
-                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Reporte de averias con responsable asignado y solucion registrada.</p>
+                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Reporte de averías con responsable asignado y solución registrada.</p>
             </div>
             <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
                 <p class="font-medium">Roles diferenciados</p>
@@ -57,7 +57,7 @@
             @else
                 <a href="{{ route('login') }}"
                     class="inline-flex items-center rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white">
-                    Iniciar sesion
+                    Iniciar sesión
                 </a>
                 <a href="{{ route('register') }}"
                     class="inline-flex items-center rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800">

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ResourceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Resource extends Model
 {
-    /** @use HasFactory<\Database\Factories\ResourceFactory> */
+    /** @use HasFactory<ResourceFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

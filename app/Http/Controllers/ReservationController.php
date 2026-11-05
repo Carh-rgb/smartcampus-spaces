@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use App\Models\Space;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**

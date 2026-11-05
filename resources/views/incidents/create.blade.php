@@ -4,7 +4,7 @@
     @if ($reservations->isEmpty())
         <div class="rounded-xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-900">
             <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                No tienes reservas aprobadas sobre las que reportar. Primero solicita un espacio y espera la aprobacion.
+                No tienes reservas aprobadas sobre las que reportar. Primero solicita un espacio y espera la aprobación.
             </p>
             <div class="mt-4 flex justify-center">
                 <x-btn :href="route('reservations.create')">Crear una reserva</x-btn>

@@ -1,4 +1,4 @@
-<x-page title="Nuevo recurso" subtitle="Agrega un equipo al catalogo." :back="route('resources.index')">
+<x-page title="Nuevo recurso" subtitle="Agrega un equipo al catálogo." :back="route('resources.index')">
 
     <form method="POST" action="{{ route('resources.store') }}" class="flex flex-col gap-5">
         @csrf

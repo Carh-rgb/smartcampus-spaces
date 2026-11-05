@@ -10,8 +10,8 @@
 
     <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
         <div class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
-            <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">Espacios donde esta instalado</h2>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Resultado de la relacion muchos a muchos.</p>
+            <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">Espacios donde está instalado</h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">Resultado de la relación muchos a muchos.</p>
         </div>
 
         <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -26,7 +26,7 @@
                 </li>
             @empty
                 <li class="px-5 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                    Este recurso no esta asignado a ningun espacio.
+                    Este recurso no está asignado a ningún espacio.
                 </li>
             @endforelse
         </ul>

@@ -73,7 +73,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header title="Log in to your account" description="Enter your email and password below to log in" />
+    <x-auth-header title="Inicia sesión" description="Escribe tu correo y tu contraseña para entrar" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -91,7 +91,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 name="password"
                 required
                 autocomplete="current-password"
-                placeholder="Password"
+                placeholder="Contraseña"
             />
 
             @if (Route::has('password.request'))
@@ -110,7 +110,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     </form>
 
     <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Don't have an account?
-        <x-text-link href="{{ route('register') }}">Sign up</x-text-link>
+        ¿No tienes cuenta?
+        <x-text-link href="{{ route('register') }}">Regístrate</x-text-link>
     </div>
 </div>

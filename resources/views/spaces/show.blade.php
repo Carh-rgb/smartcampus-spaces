@@ -16,7 +16,7 @@
     @endif
 
     <div class="grid gap-6 lg:grid-cols-2">
-        {{-- Relacion N:M: recursos asignados con su cantidad (tabla pivote) --}}
+        {{-- Relación N:M: recursos asignados con su cantidad (tabla pivote) --}}
         <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
             <div class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
                 <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">Recursos del espacio</h2>
@@ -44,7 +44,7 @@
                     </li>
                 @empty
                     <li class="px-5 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                        Este espacio todavia no tiene recursos asignados.
+                        Este espacio todavía no tiene recursos asignados.
                     </li>
                 @endforelse
             </ul>
@@ -65,7 +65,7 @@
             @endif
         </div>
 
-        {{-- Relacion 1:N: reservas del espacio --}}
+        {{-- Relación 1:N: reservas del espacio --}}
         <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
             <div class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
                 <h2 class="font-semibold text-zinc-900 dark:text-zinc-100">Reservas registradas</h2>

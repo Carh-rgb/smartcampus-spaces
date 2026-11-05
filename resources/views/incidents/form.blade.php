@@ -20,13 +20,13 @@
             :selected="$incident->priority ?? 'medium'" required />
 
         <div class="md:col-span-2">
-            <x-input name="title" label="Titulo" :value="$incident->title" required maxlength="120"
+            <x-input name="title" label="Título" :value="$incident->title" required maxlength="120"
                 help="Por ejemplo: Video beam no enciende." />
         </div>
     </div>
 
     <div class="mt-5">
-        <x-textarea name="description" label="Descripcion de la novedad" :value="$incident->description" rows="4"
+        <x-textarea name="description" label="Descripción de la novedad" :value="$incident->description" rows="4"
             maxlength="1000" required />
     </div>
 </div>

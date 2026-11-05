@@ -34,8 +34,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
 <div class="flex flex-col gap-6">
     <x-auth-header
-        title="Confirm password"
-        description="This is a secure area of the application. Please confirm your password before continuing."
+        title="Confirma tu contraseña"
+        description="Esta es un área protegida del sistema. Confirma tu contraseña para continuar."
     />
 
     <!-- Session Status -->
@@ -52,7 +52,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 name="password"
                 required
                 autocomplete="new-password"
-                placeholder="Password"
+                placeholder="Contraseña"
             />
         </div>
 
