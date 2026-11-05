@@ -1,3 +1,5 @@
+@props(['title' => null])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
@@ -12,20 +14,24 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group heading="Platform" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
+                <flux:navlist.group heading="SmartCampus" class="grid">
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Panel</flux:navlist.item>
+                    <flux:navlist.item icon="building-office-2" :href="route('spaces.index')" :current="request()->routeIs('spaces.*')" wire:navigate>Espacios</flux:navlist.item>
+                    <flux:navlist.item icon="cube" :href="route('resources.index')" :current="request()->routeIs('resources.*')" wire:navigate>Recursos</flux:navlist.item>
+                    <flux:navlist.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.*')" wire:navigate>Reservas</flux:navlist.item>
+                    <flux:navlist.item icon="wrench-screwdriver" :href="route('incidents.index')" :current="request()->routeIs('incidents.*')" wire:navigate>Incidentes</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    Repository
+                <flux:navlist.item icon="folder-git-2" href="https://github.com/Carh-rgb/smartcampus-spaces" target="_blank">
+                    Repositorio
                 </flux:navlist.item>
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits" target="_blank">
-                    Documentation
+                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs" target="_blank">
+                    Documentacion
                 </flux:navlist.item>
             </flux:navlist>
 

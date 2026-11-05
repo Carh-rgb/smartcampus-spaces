@@ -63,9 +63,9 @@ php artisan serve
 
 | Rol | Correo | Contraseña |
 |---|---|---|
-| admin | admin@uajs.edu.co | password |
-| teacher | docente@uajs.edu.co | password |
-| student | estudiante@uajs.edu.co | password |
+| admin | admin@example.com | password |
+| teacher | docente@example.com | password |
+| student | estudiante@example.com | password |
 
 ## 3. Esquema implementado
 

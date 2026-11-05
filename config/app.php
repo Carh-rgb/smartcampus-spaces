@@ -17,6 +17,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Entidad que usa el sistema
+    |--------------------------------------------------------------------------
+    |
+    | Nombre de la institucion, empresa o entidad que despliega la aplicacion.
+    | Se muestra en la portada y en el menu lateral solo si esta definido, de
+    | modo que el sistema sirva igual para cualquier organizacion sin tocar
+    | el codigo: basta con cambiar APP_ORGANIZATION en el archivo .env.
+    |
+    */
+
+    'organization' => env('APP_ORGANIZATION', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |
