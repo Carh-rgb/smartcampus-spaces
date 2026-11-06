@@ -30,4 +30,12 @@ class SpaceResource extends JsonResource
             ])->values()),
         ];
     }
+
+    /**
+     * Devuelve las tildes tal cual ("Cómputo") en lugar de "C\u00f3mputo".
+     */
+    public function jsonOptions(): int
+    {
+        return JSON_UNESCAPED_UNICODE;
+    }
 }

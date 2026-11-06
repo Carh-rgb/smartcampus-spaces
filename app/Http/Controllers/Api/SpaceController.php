@@ -64,6 +64,6 @@ class SpaceController extends Controller
                 'is_bookable' => $space->status === 'available',
                 'busy_slots' => $ocupadas,
             ],
-        ]);
+        ], options: JSON_UNESCAPED_UNICODE);
     }
 }

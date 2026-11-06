@@ -3,6 +3,7 @@
 Sistema de Gestión y Reserva de Espacios Académicos y Tecnológicos.
 
 **Actividad Formativa 2** — Configuración Inicial e Implementación del Esquema de BD con Migraciones en Laravel
+**Actividad Complementaria 3** — Enrutamiento, Controladores y Vistas Estáticas/Dinámicas del Dominio del Problema ([ver sección 8](#8-actividad-3--enrutamiento-controladores-y-vistas))
 Corporación Universitaria Antonio José de Sucre (UAJS) · Facultad de Ciencias de Ingeniería
 Materia: Electiva Profesional II · Profesor: Guillermo Antonio González Márquez
 
@@ -22,12 +23,13 @@ Materia: Electiva Profesional II · Profesor: Guillermo Antonio González Márqu
 ## 2. Instalación y puesta en marcha
 
 ```bash
-git clone <URL-DEL-REPOSITORIO> smartcampus-spaces
+git clone https://github.com/Carh-rgb/smartcampus-spaces.git
 cd smartcampus-spaces
 composer install
 npm install
 cp .env.example .env
 php artisan key:generate
+npm run build
 ```
 
 Crear la base de datos vacía y configurar la conexión en `.env`:
@@ -157,3 +159,81 @@ Comprobación rápida de las relaciones:
 ```bash
 php artisan tinker --execute="\App\Models\Space::with('resources')->first()->resources->pluck('pivot.quantity','name')"
 ```
+
+---
+
+## 8. Actividad 3 — Enrutamiento, controladores y vistas
+
+Se eligió la **opción A (monolito con Blade)**: vistas Blade sobre un layout maestro y componentes reutilizables, estilos con **Tailwind CSS 4** compilado por Vite y los componentes de interfaz de **Flux**. Además se expone una API REST de solo lectura para un posible frontend desacoplado.
+
+### 8.1 Rutas (`routes/web.php` y `routes/api.php`)
+
+Todas las rutas tienen nombre y las vistas enlazan con `route('nombre')`, nunca con URL literales. Listado completo: `php artisan route:list --except-vendor`.
+
+| Bloque | Declaración | Rutas generadas |
+|---|---|---|
+| Vistas estáticas | `Route::view('/', 'welcome')`, `Route::view('acerca', 'about')` | `home`, `about` (públicas, sin controlador porque no consultan datos) |
+| Panel | `Route::get('dashboard', DashboardController::class)` | `dashboard` (controlador invocable) |
+| Espacios | `Route::resource('spaces', …)` | `spaces.index/create/store/show/edit/update/destroy` |
+| Recursos de un espacio | `Route::controller(…)->prefix('spaces/{space}/resources')->name('spaces.resources.')` | `POST` `store`, `DELETE` `destroy` (tabla pivote) |
+| Recursos | `Route::resource('resources', …)` | las 7 del CRUD |
+| Reservas | `Route::resource('reservations', …)` + grupo `prefix('reservations/{reservation}')` | CRUD + `PATCH` `approve`, `reject`, `cancel` |
+| Incidentes | `Route::resource('incidents', …)` + grupo `prefix('incidents/{incident}')` | CRUD + `PATCH` `assign`, `resolve` |
+| Cuenta | grupo `prefix('settings')->name('settings.')` | `settings.profile`, `settings.password`, `settings.appearance` (Livewire Volt) |
+| API | grupo `prefix('v1')->name('api.v1.')` en `routes/api.php` | `GET /api/v1/spaces`, `/api/v1/spaces/{space}`, `/api/v1/spaces/{space}/availability?date=` |
+
+Verbos HTTP: `GET` para consultar, `POST` para crear, `PUT/PATCH` para actualizar, `DELETE` para borrar (borrado lógico) y `PATCH` para las acciones que solo cambian el estado de un registro. Las rutas de la aplicación están dentro del grupo `middleware(['auth', 'verified'])`.
+
+### 8.2 Controladores delgados
+
+Cada controlador solo recibe la petición, delega y devuelve la vista (`view('nombre', $datos)`) o la respuesta JSON. Las demás responsabilidades están separadas:
+
+| Responsabilidad | Dónde vive |
+|---|---|
+| Permisos por rol y por estado | `app/Policies` — `SpacePolicy`, `ResourcePolicy`, `ReservationPolicy`, `IncidentPolicy` (se invocan con `$this->authorize()` y en Blade con `@can`) |
+| Validación | `app/Http/Requests` — `SpaceRequest`, `ResourceRequest`, `AssignResourceRequest`, `ReservationRequest` (incluye el control de cruce de horarios), `ReviewReservationRequest`, `IncidentRequest`, `AssignIncidentRequest`, `ResolveIncidentRequest` |
+| Consultas reutilizables | Scopes de Eloquent: `Space::filter()`, `Space::bookable()`, `Reservation::visibleTo()`, `active()`, `overlapping()`, `reportableBy()`, `Incident::visibleTo()`, `unresolved()`, `byPriority()` |
+| Cambios de estado | Métodos del modelo: `Reservation::approve()`, `reject()`, `cancel()`; `Incident::assignTo()`, `resolve()` |
+| Forma del JSON | API Resource `app/Http/Resources/SpaceResource.php` |
+
+| Controlador | Tipo |
+|---|---|
+| `SpaceController`, `ResourceController` | Resource (7 métodos) |
+| `ReservationController`, `IncidentController` | Resource + acciones de estado |
+| `SpaceResourceController` | Rutas anidadas (pivote `resource_space`) |
+| `DashboardController` | Invocable (`__invoke`) |
+| `Api\SpaceController` | API JSON |
+
+### 8.3 Vistas y componentes
+
+```
+resources/views/
+├── components/
+│   ├── layouts/app.blade.php        # layout maestro de la aplicación (barra lateral)
+│   ├── layouts/public.blade.php     # layout de las páginas públicas
+│   ├── page.blade.php               # encabezado, acciones y avisos de cada pantalla
+│   ├── btn, badge, flash, input, select, textarea, feature-card, public-link
+├── welcome.blade.php, about.blade.php   # vistas estáticas
+├── dashboard.blade.php
+└── spaces/ resources/ reservations/ incidents/
+    ├── index, show, create, edit
+    └── form.blade.php               # formulario compartido por create y edit
+```
+
+- Los datos llegan desde el controlador (`view('spaces.index', compact('spaces', 'buildings'))`); las vistas no consultan la base de datos.
+- Los botones de administración se muestran según las Policies (`@can('update', $space)`), las mismas que protegen las rutas.
+- Listados paginados (10 por página) que conservan los filtros en la URL.
+- Interfaz completa en español, incluidos los mensajes de validación, de permisos (página 403) y la paginación.
+
+### 8.4 Diseño adaptativo
+
+Tailwind CSS con enfoque *mobile first*: barra lateral que se oculta en pantallas pequeñas, tarjetas y formularios que pasan de una a dos o cuatro columnas (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`), tablas con desplazamiento horizontal propio y tema claro/oscuro. Verificado sin desbordes desde 320 px de ancho.
+
+### 8.5 Pruebas
+
+```bash
+php artisan test
+```
+
+41 pruebas. `tests/Feature/NavigationTest.php` recorre la navegación de la actividad: listados, formularios, vistas estáticas, permisos por rol, cruce de horarios, estados que bloquean la edición (reserva aprobada, incidente resuelto) y respuestas de la API.
+
