@@ -54,12 +54,8 @@
                                 <x-btn variant="secondary" :href="route('spaces.show', $space)">Ver</x-btn>
                                 @can('update', $space)
                                     <x-btn variant="secondary" :href="route('spaces.edit', $space)">Editar</x-btn>
-                                    <form method="POST" action="{{ route('spaces.destroy', $space) }}"
-                                        onsubmit="return confirm('¿Eliminar el espacio {{ $space->name }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-btn variant="danger" type="submit">Eliminar</x-btn>
-                                    </form>
+                                    <x-delete-form :action="route('spaces.destroy', $space)"
+                                        :confirm="'¿Eliminar el espacio '.$space->name.'?'" />
                                 @endcan
                             </div>
                         </td>

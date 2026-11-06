@@ -6,6 +6,9 @@
         @can('update', $resource)
             <x-btn variant="secondary" :href="route('resources.edit', $resource)">Editar</x-btn>
         @endcan
+        @can('delete', $resource)
+            <x-delete-form :action="route('resources.destroy', $resource)" :confirm="'¿Eliminar '.$resource->name.' del catálogo?'" />
+        @endcan
     </x-slot:actions>
 
     <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">

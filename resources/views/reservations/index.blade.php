@@ -42,7 +42,12 @@
                         <td class="px-4 py-3 tabular-nums">
                             {{ substr($reservation->start_time, 0, 5) }} – {{ substr($reservation->end_time, 0, 5) }}
                         </td>
-                        <td class="px-4 py-3">{{ $reservation->space->name }}</td>
+                        <td class="px-4 py-3">
+                            {{ $reservation->space->name }}
+                            @if ($reservation->space->trashed())
+                                <span class="block text-xs text-zinc-500 dark:text-zinc-400">(espacio eliminado)</span>
+                            @endif
+                        </td>
                         @if (auth()->user()->isAdmin())
                             <td class="px-4 py-3">{{ $reservation->user->name }}</td>
                         @endif

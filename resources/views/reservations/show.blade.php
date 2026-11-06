@@ -19,6 +19,11 @@
                 <x-btn variant="secondary" type="submit">Cancelar reserva</x-btn>
             </form>
         @endcan
+
+        @can('delete', $reservation)
+            <x-delete-form :action="route('reservations.destroy', $reservation)"
+                confirm="¿Eliminar esta solicitud de reserva? Ya no aparecerá en los listados." />
+        @endcan
     </x-slot:actions>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -36,9 +41,14 @@
                 <div>
                     <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Espacio</dt>
                     <dd>
-                        <a href="{{ route('spaces.show', $reservation->space) }}" class="text-zinc-900 hover:underline dark:text-zinc-100" wire:navigate>
-                            {{ $reservation->space->name }} · {{ $reservation->space->building }}
-                        </a>
+                        @if ($reservation->space->trashed())
+                            <span class="text-zinc-900 dark:text-zinc-100">{{ $reservation->space->name }} · {{ $reservation->space->building }}</span>
+                            <span class="text-xs text-zinc-500 dark:text-zinc-400">(espacio eliminado)</span>
+                        @else
+                            <a href="{{ route('spaces.show', $reservation->space) }}" class="text-zinc-900 hover:underline dark:text-zinc-100" wire:navigate>
+                                {{ $reservation->space->name }} · {{ $reservation->space->building }}
+                            </a>
+                        @endif
                     </dd>
                 </div>
                 <div class="sm:col-span-2">
