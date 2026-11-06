@@ -118,6 +118,7 @@ return [
         'end_time' => 'hora de fin',
         'purpose' => 'razón de uso',
         'review_notes' => 'observación',
+        'rejection_reason' => 'motivo del rechazo',
         'title' => 'título',
         'priority' => 'prioridad',
         'assigned_to' => 'responsable',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RejectReservationRequest;
 use App\Http\Requests\ReservationRequest;
 use App\Http\Requests\ReviewReservationRequest;
 use App\Models\Reservation;
@@ -122,11 +123,11 @@ class ReservationController extends Controller
     /**
      * PATCH /reservations/{reservation}/reject - Decision del administrador.
      */
-    public function reject(ReviewReservationRequest $request, Reservation $reservation)
+    public function reject(RejectReservationRequest $request, Reservation $reservation)
     {
         $this->authorize('review', $reservation);
 
-        $reservation->reject($request->user(), $request->validated('review_notes'));
+        $reservation->reject($request->user(), $request->validated('rejection_reason'));
 
         return back()->with('success', 'Reserva rechazada.');
     }

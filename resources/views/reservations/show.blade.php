@@ -87,7 +87,7 @@
                 <form method="POST" action="{{ route('reservations.reject', $reservation) }}" class="flex flex-col gap-3 border-t border-zinc-200 pt-5 dark:border-zinc-700">
                     @csrf
                     @method('PATCH')
-                    <x-textarea name="review_notes" label="Motivo del rechazo" rows="2" maxlength="500" required />
+                    <x-textarea name="rejection_reason" label="Motivo del rechazo" rows="2" maxlength="500" required />
                     <x-btn variant="danger" type="submit">Rechazar</x-btn>
                 </form>
             @else

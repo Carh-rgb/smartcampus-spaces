@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * Validacion del reporte de incidentes (store y update).
+ * Validación del reporte de incidentes (store y update).
  */
 class IncidentRequest extends FormRequest
 {
@@ -17,7 +17,6 @@ class IncidentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Si falla, failedAuthorization() responde 403 con el mensaje de abajo.
         $reservationId = $this->input('reservation_id');
 
         if (! $reservationId || $this->user()->isAdmin()) {
@@ -30,10 +29,22 @@ class IncidentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reservation_id' => ['required', 'exists:reservations,id'],
+            // Solo reservas que ya ocurrieron o se liberaron (aprobadas o canceladas).
+            'reservation_id' => ['required', Rule::exists('reservations', 'id')->whereIn('status', ['approved', 'cancelled'])->whereNull('deleted_at')],
             'title' => ['required', 'string', 'max:120'],
             'description' => ['required', 'string', 'max:1000'],
             'priority' => ['required', Rule::in(['low', 'medium', 'high'])],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'reservation_id.required' => 'Selecciona la reserva en la que ocurrió la novedad.',
+            'reservation_id.exists' => 'Solo se pueden reportar novedades sobre reservas aprobadas o canceladas.',
+            'title.required' => 'Escribe un título corto, por ejemplo "Video beam no enciende".',
+            'description.required' => 'Describe qué pasó para que el administrador pueda solucionarlo.',
+            'priority.in' => 'Selecciona una prioridad de la lista.',
         ];
     }
 
