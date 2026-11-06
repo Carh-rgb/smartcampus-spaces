@@ -55,7 +55,7 @@ class IncidentController extends Controller
             $request->validated() + ['status' => 'open', 'reported_at' => now()]
         );
 
-        return to_route('incidents.show', $incident)
+        return redirect()->route('incidents.show', $incident)
             ->with('success', 'Incidente reportado. Queda abierto para su revisión.');
     }
 
@@ -96,7 +96,7 @@ class IncidentController extends Controller
 
         $incident->update($request->validated());
 
-        return to_route('incidents.show', $incident)->with('success', 'Reporte actualizado.');
+        return redirect()->route('incidents.show', $incident)->with('success', 'Reporte actualizado.');
     }
 
     /**
@@ -108,7 +108,7 @@ class IncidentController extends Controller
 
         $incident->delete();
 
-        return to_route('incidents.index')->with('success', 'Reporte eliminado.');
+        return redirect()->route('incidents.index')->with('success', 'Reporte eliminado.');
     }
 
     /**
@@ -120,7 +120,8 @@ class IncidentController extends Controller
 
         $incident->assignTo($request->integer('assigned_to'));
 
-        return back()->with('success', 'Incidente asignado. Queda en proceso.');
+        return redirect()->route('incidents.show', $incident)
+            ->with('success', 'Incidente asignado. Queda en proceso.');
     }
 
     /**
@@ -132,7 +133,8 @@ class IncidentController extends Controller
 
         $incident->resolve($request->validated('solution'), $request->user());
 
-        return back()->with('success', 'Incidente resuelto.');
+        return redirect()->route('incidents.show', $incident)
+            ->with('success', 'Incidente resuelto. Se registró la solución aplicada.');
     }
 
     /**

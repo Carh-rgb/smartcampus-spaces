@@ -25,7 +25,8 @@ class SpaceResourceController extends Controller
             $request->integer('resource_id') => ['quantity' => $request->integer('quantity')],
         ]);
 
-        return back()->with('success', 'Recurso asignado al espacio.');
+        return redirect()->route('spaces.show', $space)
+            ->with('success', 'Recurso asignado al espacio.');
     }
 
     /**
@@ -37,6 +38,7 @@ class SpaceResourceController extends Controller
 
         $space->resources()->detach($resource);
 
-        return back()->with('success', 'Recurso retirado del espacio.');
+        return redirect()->route('spaces.show', $space)
+            ->with('success', 'Recurso retirado del espacio.');
     }
 }
