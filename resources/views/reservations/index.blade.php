@@ -66,4 +66,6 @@
             </tbody>
         </table>
     </div>
+
+    {{ $reservations->links() }}
 </x-page>

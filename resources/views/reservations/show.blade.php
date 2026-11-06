@@ -21,11 +21,11 @@
         @endcan
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Datos de la solicitud</h2>
 
-            <dl class="grid gap-4 text-sm sm:grid-cols-2">
+            <dl class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                 <div>
                     <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Solicitante</dt>
                     <dd class="text-zinc-900 dark:text-zinc-100">

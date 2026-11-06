@@ -22,7 +22,7 @@ class IncidentFactory extends Factory
                 'Video beam no enciende',
                 'Aire acondicionado con fuga',
                 'Tablero inteligente sin calibrar',
-                'Sin conexion a la red WiFi',
+                'Sin conexión a la red WiFi',
                 'Sillas en mal estado',
             ]),
             'description' => fake()->sentence(12),

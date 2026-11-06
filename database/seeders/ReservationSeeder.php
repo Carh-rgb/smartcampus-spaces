@@ -32,7 +32,7 @@ class ReservationSeeder extends Seeder
             $teacher = User::where('email', 'docente@example.com')->firstOrFail();
             $student = User::where('email', 'estudiante@example.com')->firstOrFail();
 
-            $lab = Space::where('name', 'Laboratorio de Computo 1')->firstOrFail();
+            $lab = Space::where('name', 'Laboratorio de Cómputo 1')->firstOrFail();
             $auditorium = Space::where('name', 'Auditorio Principal')->firstOrFail();
             $classroom = Space::where('name', 'Aula 201')->firstOrFail();
 
@@ -42,7 +42,7 @@ class ReservationSeeder extends Seeder
                 'date' => now()->addDay()->toDateString(),
                 'start_time' => '08:00:00',
                 'end_time' => '10:00:00',
-                'purpose' => 'Clase practica de Bases de Datos II',
+                'purpose' => 'Clase práctica de Bases de Datos II',
             ]);
 
             Reservation::factory()->create([
@@ -51,7 +51,7 @@ class ReservationSeeder extends Seeder
                 'date' => now()->addDays(2)->toDateString(),
                 'start_time' => '14:00:00',
                 'end_time' => '16:00:00',
-                'purpose' => 'Reunion del semillero de investigacion',
+                'purpose' => 'Reunión del semillero de investigación',
                 'status' => 'pending',
             ]);
 

@@ -47,11 +47,13 @@
                 @empty
                     <tr>
                         <td colspan="5" class="px-4 py-10 text-center text-zinc-500 dark:text-zinc-400">
-                            El catálogo esta vacio.
+                            El catálogo está vacío.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+
+    {{ $resources->links() }}
 </x-page>

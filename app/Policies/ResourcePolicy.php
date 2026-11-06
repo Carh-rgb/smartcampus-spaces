@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Resource;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 /**
  * Permisos sobre el catalogo de recursos: todos lo consultan,
@@ -21,18 +22,24 @@ class ResourcePolicy
         return true;
     }
 
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return $user->isAdmin();
+        return $user->isAdmin()
+            ? Response::allow()
+            : Response::deny('Solo el administrador puede gestionar el catálogo de recursos.');
     }
 
-    public function update(User $user, Resource $resource): bool
+    public function update(User $user, Resource $resource): Response
     {
-        return $user->isAdmin();
+        return $user->isAdmin()
+            ? Response::allow()
+            : Response::deny('Solo el administrador puede gestionar el catálogo de recursos.');
     }
 
-    public function delete(User $user, Resource $resource): bool
+    public function delete(User $user, Resource $resource): Response
     {
-        return $user->isAdmin();
+        return $user->isAdmin()
+            ? Response::allow()
+            : Response::deny('Solo el administrador puede gestionar el catálogo de recursos.');
     }
 }

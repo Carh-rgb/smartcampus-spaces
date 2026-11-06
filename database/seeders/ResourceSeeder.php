@@ -46,8 +46,8 @@ class ResourceSeeder extends Seeder
 
             // Asignacion de recursos a cada espacio (relacion N:M con cantidad).
             $assignments = [
-                'Laboratorio de Computo 1' => ['Computador de Escritorio' => 30, 'Video Beam' => 1, 'Aire Acondicionado' => 2],
-                'Laboratorio de Computo 2' => ['Computador de Escritorio' => 25, 'Video Beam' => 1, 'Aire Acondicionado' => 2],
+                'Laboratorio de Cómputo 1' => ['Computador de Escritorio' => 30, 'Video Beam' => 1, 'Aire Acondicionado' => 2],
+                'Laboratorio de Cómputo 2' => ['Computador de Escritorio' => 25, 'Video Beam' => 1, 'Aire Acondicionado' => 2],
                 'Aula 201' => ['Video Beam' => 1, 'Tablero Inteligente' => 1, 'Aire Acondicionado' => 1],
                 'Aula 202' => ['Video Beam' => 1, 'Aire Acondicionado' => 1],
                 'Auditorio Principal' => ['Video Beam' => 2, 'Sistema de Sonido' => 1, 'Microfono Inalambrico' => 4, 'Aire Acondicionado' => 4],

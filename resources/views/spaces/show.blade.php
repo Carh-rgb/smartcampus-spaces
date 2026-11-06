@@ -15,7 +15,7 @@
         <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ $space->description }}</p>
     @endif
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {{-- Relación N:M: recursos asignados con su cantidad (tabla pivote) --}}
         <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
             <div class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
@@ -25,12 +25,12 @@
 
             <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
                 @forelse ($space->resources as $resource)
-                    <li class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                        <div class="flex items-center gap-3">
+                    <li class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-3 text-sm">
+                        <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="font-medium text-zinc-900 dark:text-zinc-100">{{ $resource->name }}</span>
                             <x-badge :value="$resource->status" :label="Catalog::label(Catalog::RESOURCE_STATUSES, $resource->status)" />
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex shrink-0 items-center gap-3">
                             <span class="tabular-nums text-zinc-600 dark:text-zinc-400">{{ $resource->pivot->quantity }} unidad(es)</span>
                             @can('manageResources', $space)
                                 <form method="POST" action="{{ route('spaces.resources.destroy', [$space, $resource]) }}"

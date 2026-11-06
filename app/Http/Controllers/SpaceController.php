@@ -25,7 +25,8 @@ class SpaceController extends Controller
             ->filter($request->only('building', 'status'))
             ->orderBy('building')
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $buildings = Space::query()->distinct()->orderBy('building')->pluck('building');
 

@@ -20,7 +20,8 @@ class ResourceController extends Controller
         $resources = Resource::query()
             ->withCount('spaces')
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('resources.index', compact('resources'));
     }
@@ -44,7 +45,7 @@ class ResourceController extends Controller
 
         Resource::create($request->validated());
 
-        return to_route('resources.index')->with('success', 'Recurso agregado al catalogo.');
+        return to_route('resources.index')->with('success', 'Recurso agregado al catálogo.');
     }
 
     /**
@@ -88,11 +89,11 @@ class ResourceController extends Controller
 
         if ($asignados = $resource->spaces()->count()) {
             return to_route('resources.index')
-                ->with('error', "No se puede eliminar: el recurso esta asignado a {$asignados} espacio(s).");
+                ->with('error', "No se puede eliminar: el recurso está asignado a {$asignados} espacio(s).");
         }
 
         $resource->delete();
 
-        return to_route('resources.index')->with('success', 'Recurso eliminado del catalogo.');
+        return to_route('resources.index')->with('success', 'Recurso eliminado del catálogo.');
     }
 }

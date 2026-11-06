@@ -28,7 +28,8 @@ class ReservationController extends Controller
             ->when($request->query('status'), fn ($query, $status) => $query->where('status', $status))
             ->orderByDesc('date')
             ->orderBy('start_time')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('reservations.index', compact('reservations'));
     }

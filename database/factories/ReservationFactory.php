@@ -24,10 +24,10 @@ class ReservationFactory extends Factory
             'end_time' => sprintf('%02d:00:00', $start + 2),
             'purpose' => fake()->randomElement([
                 'Clase de Bases de Datos II',
-                'Sustentacion de proyecto de grado',
-                'Reunion de semillero de investigacion',
-                'Taller practico de programacion',
-                'Capacitacion docente',
+                'Sustentación de proyecto de grado',
+                'Reunión de semillero de investigación',
+                'Taller práctico de programación',
+                'Capacitación docente',
             ]),
             'status' => 'pending',
         ];

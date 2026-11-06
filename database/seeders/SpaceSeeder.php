@@ -28,8 +28,8 @@ class SpaceSeeder extends Seeder
             $now = now();
 
             $datos = [
-                ['name' => 'Laboratorio de Computo 1', 'building' => 'Bloque A', 'capacity' => 30, 'type' => 'lab', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
-                ['name' => 'Laboratorio de Computo 2', 'building' => 'Bloque A', 'capacity' => 25, 'type' => 'lab', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
+                ['name' => 'Laboratorio de Cómputo 1', 'building' => 'Bloque A', 'capacity' => 30, 'type' => 'lab', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
+                ['name' => 'Laboratorio de Cómputo 2', 'building' => 'Bloque A', 'capacity' => 25, 'type' => 'lab', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
                 ['name' => 'Aula 201', 'building' => 'Bloque B', 'capacity' => 40, 'type' => 'classroom', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
                 ['name' => 'Aula 202', 'building' => 'Bloque B', 'capacity' => 40, 'type' => 'classroom', 'status' => 'maintenance', 'description' => null, 'created_at' => $now, 'updated_at' => $now],
                 ['name' => 'Auditorio Principal', 'building' => 'Bloque C', 'capacity' => 150, 'type' => 'auditorium', 'status' => 'available', 'description' => null, 'created_at' => $now, 'updated_at' => $now],

@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Incident;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 /**
  * Permisos sobre los incidentes. Quien reporta puede corregir su reporte
@@ -26,9 +27,15 @@ class IncidentPolicy
         return true;
     }
 
-    public function update(User $user, Incident $incident): bool
+    public function update(User $user, Incident $incident): Response
     {
-        return $this->ownerOrAdmin($user, $incident) && ! $incident->isResolved();
+        if (! $this->ownerOrAdmin($user, $incident)) {
+            return Response::deny('Solo puedes modificar tus propios reportes.');
+        }
+
+        return $incident->isResolved()
+            ? Response::deny('Un incidente resuelto ya no se puede editar.')
+            : Response::allow();
     }
 
     public function delete(User $user, Incident $incident): bool
@@ -39,9 +46,15 @@ class IncidentPolicy
     /**
      * Asignar responsable y registrar la solucion.
      */
-    public function manage(User $user, Incident $incident): bool
+    public function manage(User $user, Incident $incident): Response
     {
-        return $user->isAdmin() && ! $incident->isResolved();
+        if (! $user->isAdmin()) {
+            return Response::deny('Solo el administrador gestiona la solución de los incidentes.');
+        }
+
+        return $incident->isResolved()
+            ? Response::deny('Este incidente ya está resuelto.')
+            : Response::allow();
     }
 
     private function ownerOrAdmin(User $user, Incident $incident): bool

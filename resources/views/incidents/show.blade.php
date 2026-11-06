@@ -22,7 +22,7 @@
         @endcan
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Novedad reportada</h2>
 

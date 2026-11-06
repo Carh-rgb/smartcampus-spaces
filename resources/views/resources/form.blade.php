@@ -1,7 +1,7 @@
 @use(App\Support\Catalog)
 
 <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-    <div class="grid gap-5 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <x-input name="name" label="Nombre del recurso" :value="$resource->name" required maxlength="100"
             help="Por ejemplo: Video Beam, Tablero Inteligente." />
 

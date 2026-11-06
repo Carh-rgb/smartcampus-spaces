@@ -1,6 +1,6 @@
 @use(App\Support\Catalog)
 
-<x-page title="Espacios" subtitle="Salas, laboratorios, auditorios y demas espacios disponibles para reserva.">
+<x-page title="Espacios" subtitle="Salas, laboratorios, auditorios y demás espacios disponibles para reserva.">
     @can('create', App\Models\Space::class)
         <x-slot:actions>
             <x-btn :href="route('spaces.create')">Nuevo espacio</x-btn>
@@ -75,7 +75,9 @@
         </table>
     </div>
 
+    {{ $spaces->links() }}
+
     <p class="text-xs text-zinc-500 dark:text-zinc-400">
-        {{ $spaces->count() }} espacio(s). Consulta en JSON: <code>GET /api/v1/spaces</code>
+        {{ $spaces->total() }} espacio(s). Consulta en JSON: <code>GET /api/v1/spaces</code>
     </p>
 </x-page>
