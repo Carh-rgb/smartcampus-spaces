@@ -8,21 +8,21 @@
         <x-badge :value="$incident->priority" :label="'Prioridad '.Catalog::label(Catalog::PRIORITIES, $incident->priority)" />
         <x-badge :value="$incident->status" :label="Catalog::label(Catalog::INCIDENT_STATUSES, $incident->status)" />
 
-        @if ($incident->status !== 'resolved')
+        @can('update', $incident)
             <x-btn variant="secondary" :href="route('incidents.edit', $incident)">Editar</x-btn>
-        @endif
+        @endcan
 
-        @if (auth()->user()->isAdmin() || $incident->user_id === auth()->id())
+        @can('delete', $incident)
             <form method="POST" action="{{ route('incidents.destroy', $incident) }}"
                 onsubmit="return confirm('¿Eliminar este reporte?')">
                 @csrf
                 @method('DELETE')
                 <x-btn variant="danger" type="submit">Eliminar</x-btn>
             </form>
-        @endif
+        @endcan
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Novedad reportada</h2>
 
@@ -62,7 +62,7 @@
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Gestión</h2>
 
-            @if (auth()->user()->isAdmin() && $incident->status !== 'resolved')
+            @can('manage', $incident)
                 <form method="POST" action="{{ route('incidents.assign', $incident) }}" class="mb-5 flex flex-col gap-3">
                     @csrf
                     @method('PATCH')
@@ -86,7 +86,7 @@
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
                     El administrador asignará un responsable y registrará la solución.
                 </p>
-            @endif
+            @endcan
         </div>
     </div>
 </x-page>

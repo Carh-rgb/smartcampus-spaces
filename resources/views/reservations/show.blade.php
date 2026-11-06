@@ -7,25 +7,25 @@
     <x-slot:actions>
         <x-badge :value="$reservation->status" :label="Catalog::label(Catalog::RESERVATION_STATUSES, $reservation->status)" />
 
-        @if ($reservation->status === 'pending')
+        @can('update', $reservation)
             <x-btn variant="secondary" :href="route('reservations.edit', $reservation)">Editar</x-btn>
-        @endif
+        @endcan
 
-        @if (in_array($reservation->status, ['pending', 'approved']))
+        @can('cancel', $reservation)
             <form method="POST" action="{{ route('reservations.cancel', $reservation) }}"
                 onsubmit="return confirm('¿Cancelar esta reserva y liberar el espacio?')">
                 @csrf
                 @method('PATCH')
                 <x-btn variant="secondary" type="submit">Cancelar reserva</x-btn>
             </form>
-        @endif
+        @endcan
     </x-slot:actions>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Datos de la solicitud</h2>
 
-            <dl class="grid gap-4 text-sm sm:grid-cols-2">
+            <dl class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                 <div>
                     <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Solicitante</dt>
                     <dd class="text-zinc-900 dark:text-zinc-100">
@@ -64,7 +64,7 @@
 
         {{-- Panel de decisión: solo para el administrador y solo si sigue pendiente --}}
         <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-            @if (auth()->user()->isAdmin() && $reservation->status === 'pending')
+            @can('review', $reservation)
                 <h2 class="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">Decisión</h2>
 
                 <form method="POST" action="{{ route('reservations.approve', $reservation) }}" class="mb-5 flex flex-col gap-3">
@@ -88,7 +88,7 @@
                 <x-btn variant="secondary" :href="route('incidents.create', ['reservation_id' => $reservation->id])">
                     Reportar incidente
                 </x-btn>
-            @endif
+            @endcan
         </div>
     </div>
 

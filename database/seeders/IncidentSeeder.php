@@ -33,7 +33,7 @@ class IncidentSeeder extends Seeder
                 'reservation_id' => $reservation->id,
                 'user_id' => $reservation->user_id,
                 'title' => 'Video beam no enciende',
-                'description' => 'El proyector del laboratorio no muestra imagen al conectar el portatil.',
+                'description' => 'El proyector del laboratorio no muestra imagen al conectar el portátil.',
                 'priority' => 'high',
                 'status' => 'in_progress',
                 'assigned_to' => $admin->id,
@@ -43,14 +43,14 @@ class IncidentSeeder extends Seeder
                 'reservation_id' => $reservation->id,
                 'user_id' => $reservation->user_id,
                 'title' => 'Aire acondicionado sin funcionar',
-                'description' => 'La unidad del bloque A no enfria durante la jornada de la manana.',
+                'description' => 'La unidad del bloque A no enfría durante la jornada de la mañana.',
                 'priority' => 'medium',
             ]);
 
             // Incidentes aleatorios sobre las demas reservas existentes.
+            // La factory toma como reportante al solicitante de la reserva.
             Incident::factory(5)
                 ->recycle(Reservation::all())
-                ->recycle(User::where('role', '!=', 'admin')->get())
                 ->create();
 
             DB::commit();

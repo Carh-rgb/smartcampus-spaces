@@ -179,4 +179,66 @@ class NavigationTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.space.id', $this->space->id);
     }
+
+    public function test_las_vistas_estaticas_responden_sin_sesion(): void
+    {
+        $this->get(route('home'))->assertOk()->assertSee('Acerca de');
+        $this->get(route('about'))->assertOk()->assertSee('Flujo de una reserva');
+    }
+
+    public function test_no_se_puede_modificar_una_reserva_aprobada(): void
+    {
+        $reservation = Reservation::factory()->create([
+            'user_id' => $this->student->id,
+            'space_id' => $this->space->id,
+            'status' => 'approved',
+        ]);
+
+        $this->actingAs($this->student);
+
+        $this->get(route('reservations.edit', $reservation))->assertForbidden();
+
+        $this->put(route('reservations.update', $reservation), [
+            'space_id' => $this->space->id,
+            'date' => now()->addDays(3)->toDateString(),
+            'start_time' => '08:00',
+            'end_time' => '10:00',
+            'purpose' => 'Cambio no permitido',
+        ])->assertForbidden();
+    }
+
+    public function test_un_incidente_resuelto_no_se_edita(): void
+    {
+        $reservation = Reservation::factory()->create([
+            'user_id' => $this->student->id,
+            'space_id' => $this->space->id,
+            'status' => 'approved',
+        ]);
+
+        $incident = Incident::factory()->create([
+            'reservation_id' => $reservation->id,
+            'user_id' => $this->student->id,
+            'status' => 'resolved',
+        ]);
+
+        $this->actingAs($this->student)
+            ->get(route('incidents.edit', $incident))
+            ->assertForbidden();
+    }
+
+    public function test_no_se_reporta_sobre_una_reserva_ajena(): void
+    {
+        $ajena = Reservation::factory()->create([
+            'user_id' => $this->admin->id,
+            'space_id' => $this->space->id,
+            'status' => 'approved',
+        ]);
+
+        $this->actingAs($this->student)->post(route('incidents.store'), [
+            'reservation_id' => $ajena->id,
+            'title' => 'Prueba',
+            'description' => 'No deberia guardarse',
+            'priority' => 'low',
+        ])->assertForbidden();
+    }
 }

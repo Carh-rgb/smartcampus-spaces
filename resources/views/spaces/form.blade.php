@@ -3,9 +3,9 @@
 {{-- Formulario compartido por create y edit: el método y la acción
      los define cada vista antes de incluirlo. --}}
 <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-    <div class="grid gap-5 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <x-input name="name" label="Nombre del espacio" :value="$space->name" required maxlength="100"
-            help="Debe ser único, por ejemplo: Laboratorio de Computo 1." />
+            help="Debe ser único, por ejemplo: Laboratorio de Cómputo 1." />
 
         <x-input name="building" label="Bloque o ubicación" :value="$space->building" required maxlength="50" />
 

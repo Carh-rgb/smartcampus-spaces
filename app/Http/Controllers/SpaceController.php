@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SpaceRequest;
 use App\Models\Resource;
 use App\Models\Space;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /**
  * Gestion de los espacios fisicos del campus (aulas, laboratorios,
  * auditorios y salas de reunion). Controlador de tipo Resource: sus
  * siete metodos corresponden a las siete rutas de Route::resource.
+ * Permisos: SpacePolicy. Validacion: SpaceRequest.
  */
 class SpaceController extends Controller
 {
@@ -20,12 +21,12 @@ class SpaceController extends Controller
     public function index(Request $request)
     {
         $spaces = Space::query()
-            ->with('resources')
-            ->when($request->filled('building'), fn ($query) => $query->where('building', $request->building))
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->status))
+            ->withCount('resources')
+            ->filter($request->only('building', 'status'))
             ->orderBy('building')
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $buildings = Space::query()->distinct()->orderBy('building')->pluck('building');
 
@@ -37,7 +38,7 @@ class SpaceController extends Controller
      */
     public function create()
     {
-        $this->authorizeAdmin();
+        $this->authorize('create', Space::class);
 
         return view('spaces.create', ['space' => new Space]);
     }
@@ -45,17 +46,13 @@ class SpaceController extends Controller
     /**
      * POST /spaces - Guarda un espacio nuevo.
      */
-    public function store(Request $request)
+    public function store(SpaceRequest $request)
     {
-        $this->authorizeAdmin();
+        $this->authorize('create', Space::class);
 
-        $validated = $request->validate($this->rules());
+        $space = Space::create($request->validated());
 
-        $space = Space::create($validated);
-
-        return redirect()
-            ->route('spaces.show', $space)
-            ->with('success', 'Espacio creado correctamente.');
+        return to_route('spaces.show', $space)->with('success', 'Espacio creado correctamente.');
     }
 
     /**
@@ -70,7 +67,7 @@ class SpaceController extends Controller
 
         // Recursos que todavia no estan asignados a este espacio.
         $availableResources = Resource::query()
-            ->whereNotIn('id', $space->resources->pluck('id'))
+            ->whereNotIn('id', $space->resources->modelKeys())
             ->orderBy('name')
             ->get();
 
@@ -82,7 +79,7 @@ class SpaceController extends Controller
      */
     public function edit(Space $space)
     {
-        $this->authorizeAdmin();
+        $this->authorize('update', $space);
 
         return view('spaces.edit', compact('space'));
     }
@@ -90,17 +87,13 @@ class SpaceController extends Controller
     /**
      * PUT/PATCH /spaces/{space} - Actualiza el espacio.
      */
-    public function update(Request $request, Space $space)
+    public function update(SpaceRequest $request, Space $space)
     {
-        $this->authorizeAdmin();
+        $this->authorize('update', $space);
 
-        $validated = $request->validate($this->rules($space));
+        $space->update($request->validated());
 
-        $space->update($validated);
-
-        return redirect()
-            ->route('spaces.show', $space)
-            ->with('success', 'Espacio actualizado correctamente.');
+        return to_route('spaces.show', $space)->with('success', 'Espacio actualizado correctamente.');
     }
 
     /**
@@ -108,45 +101,15 @@ class SpaceController extends Controller
      */
     public function destroy(Space $space)
     {
-        $this->authorizeAdmin();
+        $this->authorize('delete', $space);
 
-        $activas = $space->reservations()
-            ->whereIn('status', ['pending', 'approved'])
-            ->count();
-
-        if ($activas > 0) {
-            return redirect()
-                ->route('spaces.index')
+        if ($activas = $space->activeReservationsCount()) {
+            return to_route('spaces.index')
                 ->with('error', "No se puede eliminar: el espacio tiene {$activas} reserva(s) activa(s).");
         }
 
         $space->delete();
 
-        return redirect()
-            ->route('spaces.index')
-            ->with('success', 'Espacio eliminado.');
-    }
-
-    /**
-     * Reglas de validacion compartidas por store() y update().
-     */
-    private function rules(?Space $space = null): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('spaces', 'name')->ignore($space)],
-            'building' => ['required', 'string', 'max:50'],
-            'capacity' => ['required', 'integer', 'min:1', 'max:1000'],
-            'type' => ['required', Rule::in(['classroom', 'lab', 'auditorium', 'meeting_room'])],
-            'status' => ['required', Rule::in(['available', 'maintenance', 'inactive'])],
-            'description' => ['nullable', 'string', 'max:500'],
-        ];
-    }
-
-    /**
-     * Solo el administrador del campus administra los espacios.
-     */
-    private function authorizeAdmin(): void
-    {
-        abort_unless(auth()->user()->isAdmin(), 403, 'Solo el administrador puede gestionar los espacios.');
+        return to_route('spaces.index')->with('success', 'Espacio eliminado.');
     }
 }

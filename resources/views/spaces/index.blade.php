@@ -1,11 +1,11 @@
 @use(App\Support\Catalog)
 
-<x-page title="Espacios" subtitle="Salas, laboratorios, auditorios y demas espacios disponibles para reserva.">
-    @if (auth()->user()->isAdmin())
+<x-page title="Espacios" subtitle="Salas, laboratorios, auditorios y demás espacios disponibles para reserva.">
+    @can('create', App\Models\Space::class)
         <x-slot:actions>
             <x-btn :href="route('spaces.create')">Nuevo espacio</x-btn>
         </x-slot:actions>
-    @endif
+    @endcan
 
     {{-- Filtros: se envian por GET para que la URL sea compartible --}}
     <form method="GET" action="{{ route('spaces.index') }}" class="flex flex-wrap items-end gap-3">
@@ -45,14 +45,14 @@
                         <td class="px-4 py-3">{{ $space->building }}</td>
                         <td class="px-4 py-3">{{ Catalog::label(Catalog::SPACE_TYPES, $space->type) }}</td>
                         <td class="px-4 py-3 text-right tabular-nums">{{ $space->capacity }}</td>
-                        <td class="px-4 py-3">{{ $space->resources->count() }}</td>
+                        <td class="px-4 py-3">{{ $space->resources_count }}</td>
                         <td class="px-4 py-3">
                             <x-badge :value="$space->status" :label="Catalog::label(Catalog::SPACE_STATUSES, $space->status)" />
                         </td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
                                 <x-btn variant="secondary" :href="route('spaces.show', $space)">Ver</x-btn>
-                                @if (auth()->user()->isAdmin())
+                                @can('update', $space)
                                     <x-btn variant="secondary" :href="route('spaces.edit', $space)">Editar</x-btn>
                                     <form method="POST" action="{{ route('spaces.destroy', $space) }}"
                                         onsubmit="return confirm('¿Eliminar el espacio {{ $space->name }}?')">
@@ -60,7 +60,7 @@
                                         @method('DELETE')
                                         <x-btn variant="danger" type="submit">Eliminar</x-btn>
                                     </form>
-                                @endif
+                                @endcan
                             </div>
                         </td>
                     </tr>
@@ -75,7 +75,9 @@
         </table>
     </div>
 
+    {{ $spaces->links() }}
+
     <p class="text-xs text-zinc-500 dark:text-zinc-400">
-        {{ $spaces->count() }} espacio(s). Consulta en JSON: <code>GET /api/v1/spaces</code>
+        {{ $spaces->total() }} espacio(s). Consulta en JSON: <code>GET /api/v1/spaces</code>
     </p>
 </x-page>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\SpaceFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -50,5 +51,38 @@ class Space extends Model
         return $this->belongsToMany(Resource::class)
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes de consulta
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Filtros del listado: bloque, estado y tipo (si vienen en la peticion).
+     */
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        return $query
+            ->when($filters['building'] ?? null, fn ($q, $building) => $q->where('building', $building))
+            ->when($filters['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+            ->when($filters['type'] ?? null, fn ($q, $type) => $q->where('type', $type));
+    }
+
+    /**
+     * Espacios que se pueden reservar (los que estan en mantenimiento no).
+     */
+    public function scopeBookable(Builder $query): Builder
+    {
+        return $query->where('status', 'available')->orderBy('building')->orderBy('name');
+    }
+
+    /**
+     * Numero de reservas pendientes o aprobadas: impide borrar el espacio.
+     */
+    public function activeReservationsCount(): int
+    {
+        return $this->reservations()->active()->count();
     }
 }

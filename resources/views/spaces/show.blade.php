@@ -5,9 +5,9 @@
 
     <x-slot:actions>
         <x-badge :value="$space->status" :label="Catalog::label(Catalog::SPACE_STATUSES, $space->status)" />
-        @if (auth()->user()->isAdmin())
+        @can('update', $space)
             <x-btn variant="secondary" :href="route('spaces.edit', $space)">Editar</x-btn>
-        @endif
+        @endcan
         <x-btn :href="route('reservations.create', ['space_id' => $space->id])">Reservar</x-btn>
     </x-slot:actions>
 
@@ -15,7 +15,7 @@
         <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ $space->description }}</p>
     @endif
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {{-- Relación N:M: recursos asignados con su cantidad (tabla pivote) --}}
         <div class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
             <div class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-700">
@@ -25,21 +25,21 @@
 
             <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
                 @forelse ($space->resources as $resource)
-                    <li class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                        <div class="flex items-center gap-3">
+                    <li class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-3 text-sm">
+                        <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="font-medium text-zinc-900 dark:text-zinc-100">{{ $resource->name }}</span>
                             <x-badge :value="$resource->status" :label="Catalog::label(Catalog::RESOURCE_STATUSES, $resource->status)" />
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex shrink-0 items-center gap-3">
                             <span class="tabular-nums text-zinc-600 dark:text-zinc-400">{{ $resource->pivot->quantity }} unidad(es)</span>
-                            @if (auth()->user()->isAdmin())
+                            @can('manageResources', $space)
                                 <form method="POST" action="{{ route('spaces.resources.destroy', [$space, $resource]) }}"
                                     onsubmit="return confirm('¿Retirar {{ $resource->name }} de este espacio?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Retirar</button>
                                 </form>
-                            @endif
+                            @endcan
                         </div>
                     </li>
                 @empty
@@ -49,7 +49,7 @@
                 @endforelse
             </ul>
 
-            @if (auth()->user()->isAdmin() && $availableResources->isNotEmpty())
+            @if ($availableResources->isNotEmpty() && auth()->user()->can('manageResources', $space))
                 <form method="POST" action="{{ route('spaces.resources.store', $space) }}"
                     class="flex flex-wrap items-end gap-3 border-t border-zinc-200 px-5 py-4 dark:border-zinc-700">
                     @csrf

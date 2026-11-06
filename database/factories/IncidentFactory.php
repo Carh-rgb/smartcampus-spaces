@@ -16,12 +16,13 @@ class IncidentFactory extends Factory
     {
         return [
             'reservation_id' => Reservation::factory(),
-            'user_id' => User::factory(),
+            // Quien reporta es el mismo solicitante de la reserva.
+            'user_id' => fn (array $attributes) => Reservation::find($attributes['reservation_id'])->user_id,
             'title' => fake()->randomElement([
                 'Video beam no enciende',
                 'Aire acondicionado con fuga',
                 'Tablero inteligente sin calibrar',
-                'Sin conexion a la red WiFi',
+                'Sin conexión a la red WiFi',
                 'Sillas en mal estado',
             ]),
             'description' => fake()->sentence(12),

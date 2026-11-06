@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ResourceRequest;
 use App\Models\Resource;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /**
  * Catalogo de recursos tecnologicos del campus (video beam, tableros,
  * aires acondicionados, etc.). Controlador de tipo Resource.
+ * Permisos: ResourcePolicy. Validacion: ResourceRequest.
  */
 class ResourceController extends Controller
 {
@@ -20,7 +20,8 @@ class ResourceController extends Controller
         $resources = Resource::query()
             ->withCount('spaces')
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('resources.index', compact('resources'));
     }
@@ -30,7 +31,7 @@ class ResourceController extends Controller
      */
     public function create()
     {
-        $this->authorizeAdmin();
+        $this->authorize('create', Resource::class);
 
         return view('resources.create', ['resource' => new Resource]);
     }
@@ -38,15 +39,13 @@ class ResourceController extends Controller
     /**
      * POST /resources - Guarda un recurso nuevo.
      */
-    public function store(Request $request)
+    public function store(ResourceRequest $request)
     {
-        $this->authorizeAdmin();
+        $this->authorize('create', Resource::class);
 
-        Resource::create($request->validate($this->rules()));
+        Resource::create($request->validated());
 
-        return redirect()
-            ->route('resources.index')
-            ->with('success', 'Recurso agregado al catalogo.');
+        return to_route('resources.index')->with('success', 'Recurso agregado al catálogo.');
     }
 
     /**
@@ -64,7 +63,7 @@ class ResourceController extends Controller
      */
     public function edit(Resource $resource)
     {
-        $this->authorizeAdmin();
+        $this->authorize('update', $resource);
 
         return view('resources.edit', compact('resource'));
     }
@@ -72,50 +71,29 @@ class ResourceController extends Controller
     /**
      * PUT/PATCH /resources/{resource} - Actualiza el recurso.
      */
-    public function update(Request $request, Resource $resource)
+    public function update(ResourceRequest $request, Resource $resource)
     {
-        $this->authorizeAdmin();
+        $this->authorize('update', $resource);
 
-        $resource->update($request->validate($this->rules($resource)));
+        $resource->update($request->validated());
 
-        return redirect()
-            ->route('resources.index')
-            ->with('success', 'Recurso actualizado.');
+        return to_route('resources.index')->with('success', 'Recurso actualizado.');
     }
 
     /**
-     * DELETE /resources/{resource} - Borrado logico del recurso.
+     * DELETE /resources/{resource} - Borrado logico, salvo que este asignado.
      */
     public function destroy(Resource $resource)
     {
-        $this->authorizeAdmin();
+        $this->authorize('delete', $resource);
 
-        $asignados = $resource->spaces()->count();
-
-        if ($asignados > 0) {
-            return redirect()
-                ->route('resources.index')
-                ->with('error', "No se puede eliminar: el recurso esta asignado a {$asignados} espacio(s).");
+        if ($asignados = $resource->spaces()->count()) {
+            return to_route('resources.index')
+                ->with('error', "No se puede eliminar: el recurso está asignado a {$asignados} espacio(s).");
         }
 
         $resource->delete();
 
-        return redirect()
-            ->route('resources.index')
-            ->with('success', 'Recurso eliminado del catalogo.');
-    }
-
-    private function rules(?Resource $resource = null): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('resources', 'name')->ignore($resource)],
-            'description' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', Rule::in(['operational', 'maintenance', 'out_of_service'])],
-        ];
-    }
-
-    private function authorizeAdmin(): void
-    {
-        abort_unless(auth()->user()->isAdmin(), 403, 'Solo el administrador puede gestionar el catalogo de recursos.');
+        return to_route('resources.index')->with('success', 'Recurso eliminado del catálogo.');
     }
 }

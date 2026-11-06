@@ -65,4 +65,6 @@
             </tbody>
         </table>
     </div>
+
+    {{ $incidents->links() }}
 </x-page>
