@@ -48,9 +48,9 @@ class IncidentSeeder extends Seeder
             ]);
 
             // Incidentes aleatorios sobre las demas reservas existentes.
+            // La factory toma como reportante al solicitante de la reserva.
             Incident::factory(5)
                 ->recycle(Reservation::all())
-                ->recycle(User::where('role', '!=', 'admin')->get())
                 ->create();
 
             DB::commit();

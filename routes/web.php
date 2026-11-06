@@ -11,68 +11,84 @@ use Livewire\Volt\Volt;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas publicas
+| Vistas estaticas (publicas)
 |--------------------------------------------------------------------------
+| No necesitan datos de la base de datos, por eso se declaran con
+| Route::view en lugar de un controlador o una funcion anonima.
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::view('/', 'welcome')->name('home');
+Route::view('acerca', 'about')->name('about');
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de la aplicacion (requieren sesion iniciada)
+| Vistas dinamicas (requieren sesion iniciada)
 |--------------------------------------------------------------------------
-| Cada entidad del dominio se expone con Route::resource, que genera las
-| siete rutas nombradas del CRUD (index, create, store, show, edit, update
-| y destroy) con sus verbos HTTP correspondientes. Las acciones que cambian
-| el estado de un registro se declaran aparte con el verbo PATCH.
+| Cada entidad del dominio tiene su propio bloque:
+|  - Route::resource genera las siete rutas nombradas del CRUD (index,
+|    create, store, show, edit, update y destroy) con sus verbos HTTP.
+|  - Las acciones extra se agrupan con controller() + prefix() + name(),
+|    asi comparten el controlador, la URL base y el prefijo del nombre.
+|  - Las acciones que solo cambian el estado de un registro usan PATCH.
+| Los permisos de cada accion se resuelven en app/Policies.
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Panel de inicio (controlador invocable).
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     // Espacios del campus: aulas, laboratorios, auditorios y salas.
     Route::resource('spaces', SpaceController::class);
 
     // Recursos asignados a un espacio (tabla pivote resource_space).
-    Route::post('spaces/{space}/resources', [SpaceResourceController::class, 'store'])
-        ->name('spaces.resources.store');
-    Route::delete('spaces/{space}/resources/{resource}', [SpaceResourceController::class, 'destroy'])
-        ->name('spaces.resources.destroy');
+    Route::controller(SpaceResourceController::class)
+        ->prefix('spaces/{space}/resources')
+        ->name('spaces.resources.')
+        ->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::delete('{resource}', 'destroy')->name('destroy');
+        });
 
     // Catalogo de recursos tecnologicos.
     Route::resource('resources', ResourceController::class);
 
     // Solicitudes de reserva y sus cambios de estado.
     Route::resource('reservations', ReservationController::class);
-    Route::patch('reservations/{reservation}/approve', [ReservationController::class, 'approve'])
-        ->name('reservations.approve');
-    Route::patch('reservations/{reservation}/reject', [ReservationController::class, 'reject'])
-        ->name('reservations.reject');
-    Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])
-        ->name('reservations.cancel');
+
+    Route::controller(ReservationController::class)
+        ->prefix('reservations/{reservation}')
+        ->name('reservations.')
+        ->group(function () {
+            Route::patch('approve', 'approve')->name('approve');
+            Route::patch('reject', 'reject')->name('reject');
+            Route::patch('cancel', 'cancel')->name('cancel');
+        });
 
     // Incidentes reportados sobre una reserva.
     Route::resource('incidents', IncidentController::class);
-    Route::patch('incidents/{incident}/assign', [IncidentController::class, 'assign'])
-        ->name('incidents.assign');
-    Route::patch('incidents/{incident}/resolve', [IncidentController::class, 'resolve'])
-        ->name('incidents.resolve');
+
+    Route::controller(IncidentController::class)
+        ->prefix('incidents/{incident}')
+        ->name('incidents.')
+        ->group(function () {
+            Route::patch('assign', 'assign')->name('assign');
+            Route::patch('resolve', 'resolve')->name('resolve');
+        });
 });
 
 /*
 |--------------------------------------------------------------------------
-| Perfil del usuario (starter kit)
+| Configuracion de la cuenta (componentes Livewire Volt del starter kit)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+Route::redirect('settings', '/settings/profile')->middleware('auth');
 
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+Route::middleware(['auth'])->prefix('settings')->name('settings.')->group(function () {
+    Volt::route('profile', 'settings.profile')->name('profile');
+    Volt::route('password', 'settings.password')->name('password');
+    Volt::route('appearance', 'settings.appearance')->name('appearance');
 });
 
 require __DIR__.'/auth.php';

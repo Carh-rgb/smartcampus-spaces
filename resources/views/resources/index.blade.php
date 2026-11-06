@@ -1,11 +1,11 @@
 @use(App\Support\Catalog)
 
 <x-page title="Catálogo de recursos" subtitle="Equipamiento tecnológico que puede estar instalado en cada espacio.">
-    @if (auth()->user()->isAdmin())
+    @can('create', App\Models\Resource::class)
         <x-slot:actions>
             <x-btn :href="route('resources.create')">Nuevo recurso</x-btn>
         </x-slot:actions>
-    @endif
+    @endcan
 
     <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
         <table class="w-full text-sm">
@@ -32,7 +32,7 @@
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
                                 <x-btn variant="secondary" :href="route('resources.show', $resource)">Ver</x-btn>
-                                @if (auth()->user()->isAdmin())
+                                @can('update', $resource)
                                     <x-btn variant="secondary" :href="route('resources.edit', $resource)">Editar</x-btn>
                                     <form method="POST" action="{{ route('resources.destroy', $resource) }}"
                                         onsubmit="return confirm('¿Eliminar {{ $resource->name }} del catálogo?')">
@@ -40,7 +40,7 @@
                                         @method('DELETE')
                                         <x-btn variant="danger" type="submit">Eliminar</x-btn>
                                     </form>
-                                @endif
+                                @endcan
                             </div>
                         </td>
                     </tr>

@@ -6,6 +6,7 @@ use App\Models\Incident;
 use App\Models\Reservation;
 use App\Models\Resource;
 use App\Models\Space;
+use Illuminate\Http\Request;
 
 /**
  * Panel de inicio: resumen del estado del campus y accesos a cada modulo.
@@ -13,21 +14,21 @@ use App\Models\Space;
  */
 class DashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $metrics = [
             'spaces' => Space::where('status', 'available')->count(),
             'resources' => Resource::count(),
             'pending' => Reservation::where('status', 'pending')->count(),
-            'incidents' => Incident::whereIn('status', ['open', 'in_progress'])->count(),
+            'incidents' => Incident::unresolved()->count(),
         ];
 
         // El administrador ve la cola de aprobacion; el solicitante, lo suyo.
         $reservations = Reservation::query()
             ->with(['user', 'space'])
-            ->unless($user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->visibleTo($user)
             ->when($user->isAdmin(), fn ($query) => $query->where('status', 'pending'))
             ->orderBy('date')
             ->orderBy('start_time')
@@ -35,10 +36,10 @@ class DashboardController extends Controller
             ->get();
 
         $incidents = Incident::query()
-            ->with(['reservation.space'])
-            ->unless($user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
-            ->whereIn('status', ['open', 'in_progress'])
-            ->orderByDesc('reported_at')
+            ->with('reservation.space')
+            ->visibleTo($user)
+            ->unresolved()
+            ->latest('reported_at')
             ->take(5)
             ->get();
 

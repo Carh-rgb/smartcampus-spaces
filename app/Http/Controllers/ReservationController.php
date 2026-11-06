@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReservationRequest;
+use App\Http\Requests\ReviewReservationRequest;
 use App\Models\Reservation;
 use App\Models\Space;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Solicitudes de uso de un espacio. Ademas de las siete rutas de
  * Route::resource, expone acciones de estado (aprobar, rechazar,
  * cancelar) mapeadas al verbo PATCH.
+ * Permisos: ReservationPolicy. Validacion: ReservationRequest
+ * (incluye el control de cruce de horarios).
  */
 class ReservationController extends Controller
 {
@@ -19,12 +22,10 @@ class ReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
-
         $reservations = Reservation::query()
             ->with(['user', 'space', 'approver'])
-            ->unless($user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->status))
+            ->visibleTo($request->user())
+            ->when($request->query('status'), fn ($query, $status) => $query->where('status', $status))
             ->orderByDesc('date')
             ->orderBy('start_time')
             ->get();
@@ -39,27 +40,21 @@ class ReservationController extends Controller
     {
         return view('reservations.create', [
             'reservation' => new Reservation,
-            'spaces' => $this->availableSpaces(),
+            'spaces' => Space::bookable()->get(),
         ]);
     }
 
     /**
      * POST /reservations - Registra la solicitud en estado pendiente.
      */
-    public function store(Request $request)
+    public function store(ReservationRequest $request)
     {
-        $validated = $request->validate($this->rules());
+        $reservation = $request->user()->reservations()->create(
+            $request->validated() + ['status' => 'pending']
+        );
 
-        $this->ensureNoOverlap($validated);
-
-        $reservation = Reservation::create($validated + [
-            'user_id' => auth()->id(),
-            'status' => 'pending',
-        ]);
-
-        return redirect()
-            ->route('reservations.show', $reservation)
-            ->with('success', 'Solicitud enviada. Queda pendiente de aprobacion.');
+        return to_route('reservations.show', $reservation)
+            ->with('success', 'Solicitud enviada. Queda pendiente de aprobación.');
     }
 
     /**
@@ -67,7 +62,7 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        $this->authorizeOwnerOrAdmin($reservation);
+        $this->authorize('view', $reservation);
 
         $reservation->load(['user', 'space', 'approver', 'incidents.user']);
 
@@ -79,32 +74,24 @@ class ReservationController extends Controller
      */
     public function edit(Reservation $reservation)
     {
-        $this->authorizeOwnerOrAdmin($reservation);
-
-        abort_unless($reservation->status === 'pending', 403, 'Solo se puede editar una solicitud pendiente.');
+        $this->authorize('update', $reservation);
 
         return view('reservations.edit', [
             'reservation' => $reservation,
-            'spaces' => $this->availableSpaces(),
+            'spaces' => Space::bookable()->get(),
         ]);
     }
 
     /**
-     * PUT/PATCH /reservations/{reservation} - Actualiza la solicitud.
+     * PUT/PATCH /reservations/{reservation} - Actualiza la solicitud pendiente.
      */
-    public function update(Request $request, Reservation $reservation)
+    public function update(ReservationRequest $request, Reservation $reservation)
     {
-        $this->authorizeOwnerOrAdmin($reservation);
+        $this->authorize('update', $reservation);
 
-        $validated = $request->validate($this->rules());
+        $reservation->update($request->validated());
 
-        $this->ensureNoOverlap($validated, $reservation);
-
-        $reservation->update($validated);
-
-        return redirect()
-            ->route('reservations.show', $reservation)
-            ->with('success', 'Solicitud actualizada.');
+        return to_route('reservations.show', $reservation)->with('success', 'Solicitud actualizada.');
     }
 
     /**
@@ -112,28 +99,21 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        $this->authorizeOwnerOrAdmin($reservation);
+        $this->authorize('delete', $reservation);
 
         $reservation->delete();
 
-        return redirect()
-            ->route('reservations.index')
-            ->with('success', 'Solicitud eliminada.');
+        return to_route('reservations.index')->with('success', 'Solicitud eliminada.');
     }
 
     /**
      * PATCH /reservations/{reservation}/approve - Decision del administrador.
      */
-    public function approve(Request $request, Reservation $reservation)
+    public function approve(ReviewReservationRequest $request, Reservation $reservation)
     {
-        $this->authorizeAdmin();
+        $this->authorize('review', $reservation);
 
-        $reservation->update([
-            'status' => 'approved',
-            'approved_by' => auth()->id(),
-            'reviewed_at' => now(),
-            'review_notes' => $request->input('review_notes'),
-        ]);
+        $reservation->approve($request->user(), $request->validated('review_notes'));
 
         return back()->with('success', 'Reserva aprobada.');
     }
@@ -141,20 +121,11 @@ class ReservationController extends Controller
     /**
      * PATCH /reservations/{reservation}/reject - Decision del administrador.
      */
-    public function reject(Request $request, Reservation $reservation)
+    public function reject(ReviewReservationRequest $request, Reservation $reservation)
     {
-        $this->authorizeAdmin();
+        $this->authorize('review', $reservation);
 
-        $validated = $request->validate([
-            'review_notes' => ['required', 'string', 'max:500'],
-        ]);
-
-        $reservation->update([
-            'status' => 'rejected',
-            'approved_by' => auth()->id(),
-            'reviewed_at' => now(),
-            'review_notes' => $validated['review_notes'],
-        ]);
+        $reservation->reject($request->user(), $request->validated('review_notes'));
 
         return back()->with('success', 'Reserva rechazada.');
     }
@@ -164,73 +135,10 @@ class ReservationController extends Controller
      */
     public function cancel(Reservation $reservation)
     {
-        $this->authorizeOwnerOrAdmin($reservation);
+        $this->authorize('cancel', $reservation);
 
-        abort_if($reservation->status === 'rejected', 403, 'Una reserva rechazada no se puede cancelar.');
-
-        $reservation->update(['status' => 'cancelled']);
+        $reservation->cancel();
 
         return back()->with('success', 'Reserva cancelada. El espacio queda libre.');
-    }
-
-    /**
-     * Reglas de validacion de la solicitud.
-     */
-    private function rules(): array
-    {
-        return [
-            'space_id' => ['required', 'exists:spaces,id'],
-            'date' => ['required', 'date', 'after_or_equal:today'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-            'purpose' => ['required', 'string', 'max:255'],
-        ];
-    }
-
-    /**
-     * Valida el cruce de horarios: la base de datos tiene el indice
-     * (space_id, date, start_time), pero la regla de negocio vive aqui
-     * porque debe ignorar las reservas rechazadas y canceladas.
-     */
-    private function ensureNoOverlap(array $data, ?Reservation $ignore = null): void
-    {
-        $existe = Reservation::query()
-            ->where('space_id', $data['space_id'])
-            ->whereDate('date', $data['date'])
-            ->whereIn('status', ['pending', 'approved'])
-            ->when($ignore, fn ($query) => $query->whereKeyNot($ignore->getKey()))
-            ->where('start_time', '<', $data['end_time'])
-            ->where('end_time', '>', $data['start_time'])
-            ->exists();
-
-        if ($existe) {
-            throw ValidationException::withMessages([
-                'start_time' => 'El espacio ya tiene una reserva activa que se cruza con ese horario.',
-            ]);
-        }
-    }
-
-    /**
-     * Espacios que se pueden reservar (los que estan en mantenimiento no).
-     */
-    private function availableSpaces()
-    {
-        return Space::query()
-            ->where('status', 'available')
-            ->orderBy('building')
-            ->orderBy('name')
-            ->get();
-    }
-
-    private function authorizeOwnerOrAdmin(Reservation $reservation): void
-    {
-        $user = auth()->user();
-
-        abort_unless($user->isAdmin() || $reservation->user_id === $user->id, 403);
-    }
-
-    private function authorizeAdmin(): void
-    {
-        abort_unless(auth()->user()->isAdmin(), 403, 'Solo el administrador aprueba o rechaza reservas.');
     }
 }

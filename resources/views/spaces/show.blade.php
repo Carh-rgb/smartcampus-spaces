@@ -5,9 +5,9 @@
 
     <x-slot:actions>
         <x-badge :value="$space->status" :label="Catalog::label(Catalog::SPACE_STATUSES, $space->status)" />
-        @if (auth()->user()->isAdmin())
+        @can('update', $space)
             <x-btn variant="secondary" :href="route('spaces.edit', $space)">Editar</x-btn>
-        @endif
+        @endcan
         <x-btn :href="route('reservations.create', ['space_id' => $space->id])">Reservar</x-btn>
     </x-slot:actions>
 
@@ -32,14 +32,14 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="tabular-nums text-zinc-600 dark:text-zinc-400">{{ $resource->pivot->quantity }} unidad(es)</span>
-                            @if (auth()->user()->isAdmin())
+                            @can('manageResources', $space)
                                 <form method="POST" action="{{ route('spaces.resources.destroy', [$space, $resource]) }}"
                                     onsubmit="return confirm('¿Retirar {{ $resource->name }} de este espacio?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Retirar</button>
                                 </form>
-                            @endif
+                            @endcan
                         </div>
                     </li>
                 @empty
@@ -49,7 +49,7 @@
                 @endforelse
             </ul>
 
-            @if (auth()->user()->isAdmin() && $availableResources->isNotEmpty())
+            @if ($availableResources->isNotEmpty() && auth()->user()->can('manageResources', $space))
                 <form method="POST" action="{{ route('spaces.resources.store', $space) }}"
                     class="flex flex-wrap items-end gap-3 border-t border-zinc-200 px-5 py-4 dark:border-zinc-700">
                     @csrf
