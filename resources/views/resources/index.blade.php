@@ -34,12 +34,8 @@
                                 <x-btn variant="secondary" :href="route('resources.show', $resource)">Ver</x-btn>
                                 @can('update', $resource)
                                     <x-btn variant="secondary" :href="route('resources.edit', $resource)">Editar</x-btn>
-                                    <form method="POST" action="{{ route('resources.destroy', $resource) }}"
-                                        onsubmit="return confirm('¿Eliminar {{ $resource->name }} del catálogo?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-btn variant="danger" type="submit">Eliminar</x-btn>
-                                    </form>
+                                    <x-delete-form :action="route('resources.destroy', $resource)"
+                                        :confirm="'¿Eliminar '.$resource->name.' del catálogo?'" />
                                 @endcan
                             </div>
                         </td>

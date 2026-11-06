@@ -58,7 +58,9 @@ class Reservation extends Model
      */
     public function space(): BelongsTo
     {
-        return $this->belongsTo(Space::class);
+        // withTrashed: la reserva conserva su espacio aunque este se haya
+        // eliminado (borrado logico), asi el historial sigue mostrandose.
+        return $this->belongsTo(Space::class)->withTrashed();
     }
 
     /**

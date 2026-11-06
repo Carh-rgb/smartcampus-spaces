@@ -6,8 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * Validacion del formulario de espacios (store y update).
- * La autorizacion la resuelve SpacePolicy desde el controlador.
+ * Validación del formulario de espacios (store y update).
+ * La autorización la resuelve SpacePolicy desde el controlador.
  */
 class SpaceRequest extends FormRequest
 {
@@ -20,6 +20,21 @@ class SpaceRequest extends FormRequest
             'type' => ['required', Rule::in(['classroom', 'lab', 'auditorium', 'meeting_room'])],
             'status' => ['required', Rule::in(['available', 'maintenance', 'inactive'])],
             'description' => ['nullable', 'string', 'max:500'],
+        ];
+    }
+
+    /**
+     * Mensajes propios que explican cómo corregir el dato.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'Ya existe un espacio con ese nombre. Usa un nombre distinto, por ejemplo agregando el número o el bloque.',
+            'capacity.integer' => 'La capacidad debe ser un número entero de personas.',
+            'capacity.min' => 'La capacidad debe ser de al menos 1 persona.',
+            'capacity.max' => 'La capacidad no puede superar las 1000 personas.',
+            'type.in' => 'Selecciona un tipo de espacio de la lista.',
+            'status.in' => 'Selecciona un estado de la lista.',
         ];
     }
 }

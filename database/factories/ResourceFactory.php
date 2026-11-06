@@ -15,7 +15,7 @@ class ResourceFactory extends Factory
             'name' => fake()->unique()->randomElement([
                 'Video Beam', 'Tablero Inteligente', 'Aire Acondicionado',
                 'Computador de Escritorio', 'Sistema de Sonido', 'Televisor 55"',
-                'Microfono Inalambrico', 'Router WiFi',
+                'Micrófono Inalámbrico', 'Router WiFi',
             ]),
             'description' => fake()->optional()->sentence(6),
             'status' => 'operational',

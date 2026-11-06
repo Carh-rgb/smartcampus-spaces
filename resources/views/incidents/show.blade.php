@@ -13,12 +13,7 @@
         @endcan
 
         @can('delete', $incident)
-            <form method="POST" action="{{ route('incidents.destroy', $incident) }}"
-                onsubmit="return confirm('¿Eliminar este reporte?')">
-                @csrf
-                @method('DELETE')
-                <x-btn variant="danger" type="submit">Eliminar</x-btn>
-            </form>
+            <x-delete-form :action="route('incidents.destroy', $incident)" confirm="¿Eliminar este reporte de incidente?" />
         @endcan
     </x-slot:actions>
 
@@ -40,9 +35,13 @@
                 <div>
                     <dt class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">Reserva</dt>
                     <dd>
-                        <a href="{{ route('reservations.show', $incident->reservation) }}" class="text-zinc-900 hover:underline dark:text-zinc-100" wire:navigate>
-                            Ver la reserva
-                        </a>
+                        @if ($incident->reservation->trashed())
+                            <span class="text-zinc-500 dark:text-zinc-400">Reserva eliminada</span>
+                        @else
+                            <a href="{{ route('reservations.show', $incident->reservation) }}" class="text-zinc-900 hover:underline dark:text-zinc-100" wire:navigate>
+                                Ver la reserva
+                            </a>
+                        @endif
                     </dd>
                 </div>
                 <div>

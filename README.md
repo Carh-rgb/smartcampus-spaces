@@ -4,6 +4,7 @@ Sistema de Gestión y Reserva de Espacios Académicos y Tecnológicos.
 
 **Actividad Formativa 2** — Configuración Inicial e Implementación del Esquema de BD con Migraciones en Laravel
 **Actividad Complementaria 3** — Enrutamiento, Controladores y Vistas Estáticas/Dinámicas del Dominio del Problema ([ver sección 8](#8-actividad-3--enrutamiento-controladores-y-vistas))
+**Actividad 4** — Operaciones CRUD Completas, Validación de Formularios e Integración Eloquent-Vista ([ver sección 9](#9-actividad-4--crud-completo-validación-y-retroalimentación))
 Corporación Universitaria Antonio José de Sucre (UAJS) · Facultad de Ciencias de Ingeniería
 Materia: Electiva Profesional II · Profesor: Guillermo Antonio González Márquez
 
@@ -191,7 +192,7 @@ Cada controlador solo recibe la petición, delega y devuelve la vista (`view('no
 | Responsabilidad | Dónde vive |
 |---|---|
 | Permisos por rol y por estado | `app/Policies` — `SpacePolicy`, `ResourcePolicy`, `ReservationPolicy`, `IncidentPolicy` (se invocan con `$this->authorize()` y en Blade con `@can`) |
-| Validación | `app/Http/Requests` — `SpaceRequest`, `ResourceRequest`, `AssignResourceRequest`, `ReservationRequest` (incluye el control de cruce de horarios), `ReviewReservationRequest`, `IncidentRequest`, `AssignIncidentRequest`, `ResolveIncidentRequest` |
+| Validación | `app/Http/Requests` — `SpaceRequest`, `ResourceRequest`, `AssignResourceRequest`, `ReservationRequest` (incluye el control de cruce de horarios), `ReviewReservationRequest`, `RejectReservationRequest`, `IncidentRequest`, `AssignIncidentRequest`, `ResolveIncidentRequest` |
 | Consultas reutilizables | Scopes de Eloquent: `Space::filter()`, `Space::bookable()`, `Reservation::visibleTo()`, `active()`, `overlapping()`, `reportableBy()`, `Incident::visibleTo()`, `unresolved()`, `byPriority()` |
 | Cambios de estado | Métodos del modelo: `Reservation::approve()`, `reject()`, `cancel()`; `Incident::assignTo()`, `resolve()` |
 | Forma del JSON | API Resource `app/Http/Resources/SpaceResource.php` |
@@ -213,6 +214,8 @@ resources/views/
 │   ├── layouts/public.blade.php     # layout de las páginas públicas
 │   ├── page.blade.php               # encabezado, acciones y avisos de cada pantalla
 │   ├── btn, badge, flash, input, select, textarea, feature-card, public-link
+│   ├── delete-form.blade.php        # formulario DELETE con @csrf y confirmación
+│   ├── toast.blade.php              # notificaciones de éxito o error
 ├── welcome.blade.php, about.blade.php   # vistas estáticas
 ├── dashboard.blade.php
 └── spaces/ resources/ reservations/ incidents/
@@ -235,5 +238,44 @@ Tailwind CSS con enfoque *mobile first*: barra lateral que se oculta en pantalla
 php artisan test
 ```
 
-41 pruebas. `tests/Feature/NavigationTest.php` recorre la navegación de la actividad: listados, formularios, vistas estáticas, permisos por rol, cruce de horarios, estados que bloquean la edición (reserva aprobada, incidente resuelto) y respuestas de la API.
+62 pruebas. `tests/Feature/NavigationTest.php` recorre la navegación de la actividad: listados, formularios, vistas estáticas, permisos por rol, cruce de horarios, estados que bloquean la edición (reserva aprobada, incidente resuelto) y respuestas de la API.
+
+---
+
+## 9. Actividad 4 — CRUD completo, validación y retroalimentación
+
+### 9.1 Flujo CRUD con Eloquent
+
+Las cuatro entidades principales se crean, consultan, editan y eliminan desde la interfaz, siempre a través de los modelos Eloquent (`create`, `update`, `delete`, relaciones y *scopes*):
+
+| Entidad | Crear (`POST`) | Consultar (`GET`) | Editar (`PUT`) | Eliminar (`DELETE`) | Acciones extra (`PATCH`/`POST`) |
+|---|---|---|---|---|---|
+| Espacios | `spaces.store` | `spaces.index`, `spaces.show` | `spaces.update` | `spaces.destroy` | Asignar y retirar recursos (pivote) |
+| Recursos | `resources.store` | `resources.index`, `resources.show` | `resources.update` | `resources.destroy` | — |
+| Reservas | `reservations.store` | `reservations.index`, `reservations.show` | `reservations.update` | `reservations.destroy` | Aprobar, rechazar, cancelar |
+| Incidentes | `incidents.store` | `incidents.index`, `incidents.show` | `incidents.update` | `incidents.destroy` | Asignar responsable, resolver |
+
+- Los formularios usan `@csrf`, `@method('PUT')` y, para eliminar, el componente `x-delete-form` (`@csrf` + `@method('DELETE')` + confirmación).
+- El borrado es lógico (`SoftDeletes`). Las relaciones `Reservation::space()` e `Incident::reservation()` usan `withTrashed()`, de modo que el historial se sigue mostrando aunque el espacio o la reserva se hayan eliminado.
+- Reglas de integridad antes de eliminar: un espacio con reservas pendientes o aprobadas, o un recurso asignado a algún espacio, no se puede borrar y el sistema explica qué hacer.
+
+### 9.2 Validación de formularios
+
+- Toda entrada pasa por un **Form Request** (`app/Http/Requests`) con reglas de requerido, tipo, longitud, valores permitidos, existencia (`exists`) y unicidad (`unique`).
+- Cada Form Request define `messages()` con mensajes que explican cómo corregir el dato, por ejemplo *"Ya existe un espacio con ese nombre. Usa un nombre distinto…"* o *"La fecha no puede ser anterior a hoy."*
+- Reglas de negocio en el servidor, aunque el formulario se envíe a mano: no se reserva un espacio en mantenimiento ni se cruzan horarios (el mensaje indica la franja ocupada), los incidentes solo se reportan sobre reservas aprobadas o canceladas y el rechazo exige un motivo.
+- Los errores se muestran en un resumen al inicio del formulario y debajo de cada campo (`@error`), con el campo resaltado en rojo, y los componentes `x-input`, `x-select` y `x-textarea` conservan lo escrito con `old()`.
+
+### 9.3 Redirecciones y notificaciones
+
+- Tras cada operación el controlador redirige con `redirect()->route(...)` a la pantalla que corresponde (la ficha del registro creado o editado, o el listado tras eliminar) y deja un mensaje de sesión con `->with('success', …)` o `->with('error', …)`.
+- El componente `x-toast` muestra esos mensajes como notificación: verde para éxito y roja para errores de negocio, se cierra con la X y desaparece sola a los 5 segundos (8 si es un error).
+
+### 9.4 Pruebas
+
+| Archivo | Qué comprueba |
+|---|---|
+| `tests/Feature/CrudTest.php` | CRUD completo de cada entidad: base de datos, redirección, mensaje y toast |
+| `tests/Feature/ValidacionTest.php` | Errores en pantalla, mensajes explicativos, `old()` y que un dato inválido no modifique el registro |
+| `tests/Feature/EliminacionTest.php` | Borrado lógico, historial sin errores, permisos y reglas que impiden eliminar |
 

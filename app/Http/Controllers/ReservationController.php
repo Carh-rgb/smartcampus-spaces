@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RejectReservationRequest;
 use App\Http\Requests\ReservationRequest;
 use App\Http\Requests\ReviewReservationRequest;
 use App\Models\Reservation;
@@ -54,7 +55,7 @@ class ReservationController extends Controller
             $request->validated() + ['status' => 'pending']
         );
 
-        return to_route('reservations.show', $reservation)
+        return redirect()->route('reservations.show', $reservation)
             ->with('success', 'Solicitud enviada. Queda pendiente de aprobación.');
     }
 
@@ -92,7 +93,7 @@ class ReservationController extends Controller
 
         $reservation->update($request->validated());
 
-        return to_route('reservations.show', $reservation)->with('success', 'Solicitud actualizada.');
+        return redirect()->route('reservations.show', $reservation)->with('success', 'Solicitud actualizada.');
     }
 
     /**
@@ -104,7 +105,7 @@ class ReservationController extends Controller
 
         $reservation->delete();
 
-        return to_route('reservations.index')->with('success', 'Solicitud eliminada.');
+        return redirect()->route('reservations.index')->with('success', 'Solicitud eliminada.');
     }
 
     /**
@@ -116,19 +117,21 @@ class ReservationController extends Controller
 
         $reservation->approve($request->user(), $request->validated('review_notes'));
 
-        return back()->with('success', 'Reserva aprobada.');
+        return redirect()->route('reservations.show', $reservation)
+            ->with('success', 'Reserva aprobada. El espacio queda apartado para el solicitante.');
     }
 
     /**
      * PATCH /reservations/{reservation}/reject - Decision del administrador.
      */
-    public function reject(ReviewReservationRequest $request, Reservation $reservation)
+    public function reject(RejectReservationRequest $request, Reservation $reservation)
     {
         $this->authorize('review', $reservation);
 
-        $reservation->reject($request->user(), $request->validated('review_notes'));
+        $reservation->reject($request->user(), $request->validated('rejection_reason'));
 
-        return back()->with('success', 'Reserva rechazada.');
+        return redirect()->route('reservations.show', $reservation)
+            ->with('success', 'Reserva rechazada. El solicitante verá el motivo en el detalle.');
     }
 
     /**
@@ -140,6 +143,7 @@ class ReservationController extends Controller
 
         $reservation->cancel();
 
-        return back()->with('success', 'Reserva cancelada. El espacio queda libre.');
+        return redirect()->route('reservations.show', $reservation)
+            ->with('success', 'Reserva cancelada. El espacio queda libre para otros solicitantes.');
     }
 }

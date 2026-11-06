@@ -8,6 +8,9 @@
         @can('update', $space)
             <x-btn variant="secondary" :href="route('spaces.edit', $space)">Editar</x-btn>
         @endcan
+        @can('delete', $space)
+            <x-delete-form :action="route('spaces.destroy', $space)" :confirm="'¿Eliminar el espacio '.$space->name.'?'" />
+        @endcan
         <x-btn :href="route('reservations.create', ['space_id' => $space->id])">Reservar</x-btn>
     </x-slot:actions>
 
@@ -33,12 +36,8 @@
                         <div class="flex shrink-0 items-center gap-3">
                             <span class="tabular-nums text-zinc-600 dark:text-zinc-400">{{ $resource->pivot->quantity }} unidad(es)</span>
                             @can('manageResources', $space)
-                                <form method="POST" action="{{ route('spaces.resources.destroy', [$space, $resource]) }}"
-                                    onsubmit="return confirm('¿Retirar {{ $resource->name }} de este espacio?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs font-medium text-red-600 hover:underline dark:text-red-400">Retirar</button>
-                                </form>
+                                <x-delete-form :action="route('spaces.resources.destroy', [$space, $resource])"
+                                    :confirm="'¿Retirar '.$resource->name.' de este espacio?'" label="Retirar" variant="link" />
                             @endcan
                         </div>
                     </li>

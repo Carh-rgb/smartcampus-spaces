@@ -44,7 +44,9 @@ class Incident extends Model
      */
     public function reservation(): BelongsTo
     {
-        return $this->belongsTo(Reservation::class);
+        // withTrashed: el incidente conserva su reserva aunque esta se haya
+        // eliminado (borrado logico), asi el historial sigue mostrandose.
+        return $this->belongsTo(Reservation::class)->withTrashed();
     }
 
     /**

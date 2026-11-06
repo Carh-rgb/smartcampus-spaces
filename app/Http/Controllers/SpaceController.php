@@ -52,7 +52,7 @@ class SpaceController extends Controller
 
         $space = Space::create($request->validated());
 
-        return to_route('spaces.show', $space)->with('success', 'Espacio creado correctamente.');
+        return redirect()->route('spaces.show', $space)->with('success', 'Espacio creado correctamente.');
     }
 
     /**
@@ -93,7 +93,7 @@ class SpaceController extends Controller
 
         $space->update($request->validated());
 
-        return to_route('spaces.show', $space)->with('success', 'Espacio actualizado correctamente.');
+        return redirect()->route('spaces.show', $space)->with('success', 'Espacio actualizado correctamente.');
     }
 
     /**
@@ -104,12 +104,12 @@ class SpaceController extends Controller
         $this->authorize('delete', $space);
 
         if ($activas = $space->activeReservationsCount()) {
-            return to_route('spaces.index')
-                ->with('error', "No se puede eliminar: el espacio tiene {$activas} reserva(s) activa(s).");
+            return redirect()->route('spaces.index')
+                ->with('error', "No se puede eliminar {$space->name}: tiene {$activas} reserva(s) pendiente(s) o aprobada(s). Cancélalas o recházalas primero.");
         }
 
         $space->delete();
 
-        return to_route('spaces.index')->with('success', 'Espacio eliminado.');
+        return redirect()->route('spaces.index')->with('success', "Se eliminó el espacio {$space->name}.");
     }
 }
